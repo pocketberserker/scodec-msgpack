@@ -1,4 +1,4 @@
-import SCodecMsgPackBuild._
+import ScodecMsgPackBuild._
 
 name := "scodec-msgpack"
 

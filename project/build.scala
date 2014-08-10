@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 import spray.revolver.RevolverPlugin._
 
-object SCodecMsgPackBuild extends Build {
+object ScodecMsgPackBuild extends Build {
   import Dependencies._
 
   lazy val buildSettings = Defaults.defaultSettings ++
@@ -18,7 +18,7 @@ object SCodecMsgPackBuild extends Build {
       )
     )
 
-  lazy val sideburns = Project(
+  lazy val msgpack = Project(
     id = "scodec-msgpack",
     base = file("."),
     settings = buildSettings
