@@ -14,7 +14,8 @@ object ScodecMsgPackBuild extends Build {
       resolvers += "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases",
       libraryDependencies ++= Seq(
         scodec,
-        scalatest % "test"
+        scalatest % "test",
+        scalacheck % "test"
       )
     )
 
@@ -28,5 +29,6 @@ object ScodecMsgPackBuild extends Build {
 
     val scodec = "org.typelevel" %% "scodec-core" % "1.2.0"
     val scalatest = "org.scalatest" %% "scalatest" % "2.2.1"
+    val scalacheck = "org.scalacheck" %% "scalacheck" % "1.11.5"
   }
 }
