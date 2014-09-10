@@ -8,7 +8,6 @@ import scalaz.syntax.traverse._
 import scalaz.syntax.std.option._
 import scodec.Codec
 import scodec.bits.BitVector
-import scodec.codecs._
 
 // FIXME: type conversion
 private[codecs] class LongArrayCodec(size: Codec[Long]) extends Codec[IndexedSeq[MessagePack]] {

@@ -5,8 +5,6 @@ import scalaz.\/
 import scalaz.std.option._
 import scalaz.syntax.std.option._
 import scalaz.std.indexedSeq._
-import scalaz.syntax.std.indexedSeq._
-import scalaz.std.map._
 import scalaz.syntax.std.map._
 import scalaz.syntax.traverse._
 import scodec.bits.{BitVector, ByteVector}

@@ -1,7 +1,6 @@
 package scodec.msgpack
 package codecs
 
-import scalaz.\/
 import scodec.Codec
 import scodec.codecs._
 import scodec.bits.BitVector

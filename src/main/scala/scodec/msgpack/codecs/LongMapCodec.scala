@@ -2,12 +2,10 @@ package scodec.msgpack
 package codecs
 
 import scalaz.{\/, \/-, -\/}
-import scalaz.std.map._
 import scalaz.syntax.either._
 import scalaz.syntax.std.option._
 import scodec.Codec
 import scodec.bits.BitVector
-import scodec.codecs._
 
 private[codecs] class LongMapCodec(size: Codec[Long]) extends Codec[Map[MessagePack, MessagePack]] {
 

@@ -8,7 +8,6 @@ import scalaz.syntax.traverse._
 import scalaz.syntax.std.option._
 import scodec.Codec
 import scodec.bits.BitVector
-import scodec.codecs._
 
 private[codecs] class ArrayCodec(size: Codec[Int]) extends Codec[IndexedSeq[MessagePack]] {
 

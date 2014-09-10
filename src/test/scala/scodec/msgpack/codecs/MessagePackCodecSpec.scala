@@ -4,7 +4,6 @@ package codecs
 import scala.collection.immutable.IndexedSeq
 import scodec._
 import scodec.bits.{BitVector, ByteVector}
-import scalaz._
 import org.scalatest.FlatSpec
 import org.scalatest.DiagrammedAssertions
 

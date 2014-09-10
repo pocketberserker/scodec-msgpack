@@ -3,7 +3,6 @@ package scodec.msgpack
 import scala.collection.immutable.IndexedSeq
 import scodec._
 import scodec.bits.BitVector
-import scalaz._
 import org.scalatest.FlatSpec
 import org.scalatest.DiagrammedAssertions
 import org.scalacheck.Prop._

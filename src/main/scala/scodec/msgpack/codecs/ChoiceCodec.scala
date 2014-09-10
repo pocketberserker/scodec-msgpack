@@ -5,7 +5,6 @@ import scalaz.{\/-, NonEmptyList}
 import scalaz.syntax.either._
 import scodec.Codec
 import scodec.bits.BitVector
-import scodec.codecs._
 
 // TODO: fix foldLeft seed
 private[codecs] class ChoiceCodec(codecs: NonEmptyList[Codec[MessagePack]])extends Codec[MessagePack] {
