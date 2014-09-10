@@ -34,6 +34,6 @@ private[codecs] class MapCodec(size: Codec[Int]) extends Codec[Map[MessagePack, 
             remaining = BitVector.empty
         }
       }
-      error.toLeftDisjunction(BitVector.empty, builder.result)
+      error.toLeftDisjunction((BitVector.empty, builder.result))
     }}
   }

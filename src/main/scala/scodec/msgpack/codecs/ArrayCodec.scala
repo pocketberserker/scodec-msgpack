@@ -31,6 +31,6 @@ private[codecs] class ArrayCodec(size: Codec[Int]) extends Codec[IndexedSeq[Mess
             remaining = BitVector.empty
         }
       }
-      error.toLeftDisjunction(BitVector.empty, builder.result)
+      error.toLeftDisjunction((BitVector.empty, builder.result))
     }}
   }
