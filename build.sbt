@@ -8,10 +8,9 @@ licenses in ThisBuild := Seq("MIT License" -> url("http://www.opensource.org/lic
 
 scalacOptions in ThisBuild ++= Seq(
   "-deprecation",
+  "-unchecked",
   "-feature",
   "-language:implicitConversions",
-  "-Ywarn-unused",
-  "-Ywarn-unused-import",
   "-Xlint"
 )
 
