@@ -12,13 +12,13 @@ private[codecs] class FixValueCodec[A](b: Codec[BitVector], head: BitVector, bod
 
   override def encode(m: MessagePack) = for {
     h <- b.encode(head)
-    v <- unapply(m).toRightDisjunction("fail to unapply ${$name}.")
+    v <- unapply(m).toRightDisjunction(s"fail to unapply ${name}.")
     encodeM <- body.encode(v)
   } yield h ++ encodeM
 
   override def decode(buffer: BitVector) =
     b.decode(buffer).flatMap { case (rest, h) =>
       if(h.startsWith(head)) body.decode(rest).map { case (r, a) => (r, apply(a)) }
-     else -\/("first bytes did not match ${name}.")
+     else -\/(s"first bytes did not match ${name}.")
     }
 }
