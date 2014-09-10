@@ -1,6 +1,5 @@
 package scodec.msgpack
 
-import scala.collection.immutable.IndexedSeq
 import scodec._
 import scodec.bits.BitVector
 import org.scalatest.FlatSpec
@@ -41,7 +40,7 @@ class MessagePackSpec extends FlatSpec with DiagrammedAssertions with Checkers {
   implicit val from = fromInt _
 
   "array" should "be able to encode and decode" in {
-    check(forAll((a: IndexedSeq[Int]) => roundtrip(msgpack.array, a)))
+    check(forAll((a: Vector[Int]) => roundtrip(msgpack.array, a)))
   }
 
   "map" should "be able to encode and decode" in {

@@ -1,10 +1,9 @@
 package scodec
 
-import scala.collection.immutable.IndexedSeq
 import scalaz.\/
 import scalaz.std.option._
 import scalaz.syntax.std.option._
-import scalaz.std.indexedSeq._
+import scalaz.std.vector._
 import scalaz.syntax.std.map._
 import scalaz.syntax.traverse._
 import scodec.bits.{BitVector, ByteVector}
@@ -94,13 +93,13 @@ package object msgpack {
   val str: Codec[String] = gen(toStr, fromStr)
   val bin: Codec[ByteVector] = gen(toBinary, fromBinary)
 
-  private def genSeq[A](to: MessagePack => Option[IndexedSeq[A]], from: IndexedSeq[A] => MessagePack): Codec[IndexedSeq[A]] = new Codec[IndexedSeq[A]] {
-    def encode(a: IndexedSeq[A]): String \/ BitVector = MessagePackCodec.encode(from(a))
-    def decode(buffer: BitVector): String \/ (BitVector, IndexedSeq[A]) =
+  private def genVector[A](to: MessagePack => Option[Vector[A]], from: Vector[A] => MessagePack): Codec[Vector[A]] = new Codec[Vector[A]] {
+    def encode(a: Vector[A]): String \/ BitVector = MessagePackCodec.encode(from(a))
+    def decode(buffer: BitVector): String \/ (BitVector, Vector[A]) =
       MessagePackCodec.decode(buffer).flatMap { case (rest, a) => to(a).map((rest, _)).toRightDisjunction("fail to unapply") }
   }
 
-  private def fromArray[A](v: IndexedSeq[A])(implicit f: A => MessagePack): MessagePack = {
+  private def fromArray[A](v: Vector[A])(implicit f: A => MessagePack): MessagePack = {
     val len = v.size
     val vm = v.map(f)
     if(len <= 15) MFixArray(vm)
@@ -108,14 +107,14 @@ package object msgpack {
     else MArray32(vm)
   }
 
-  private def toArray[A](v: MessagePack)(implicit f: MessagePack => Option[A]): Option[IndexedSeq[A]] = v match {
+  private def toArray[A](v: MessagePack)(implicit f: MessagePack => Option[A]): Option[Vector[A]] = v match {
     case MFixArray(n) => n.map(f).sequence
     case MArray16(n) => n.map(f).sequence
     case MArray32(n) => n.map(f).sequence
     case _ => None
   }
 
-  def array[A](implicit to: MessagePack => Option[A], from: A => MessagePack) = genSeq(toArray(_)(to), (v: IndexedSeq[A]) => fromArray(v)(from))
+  def array[A](implicit to: MessagePack => Option[A], from: A => MessagePack) = genVector(toArray(_)(to), (v: Vector[A]) => fromArray(v)(from))
 
   private def genMap[A, B](to: MessagePack => Option[Map[A, B]], from: Map[A, B] => MessagePack): Codec[Map[A, B]] = new Codec[Map[A, B]] {
     def encode(a: Map[A, B]): String \/ BitVector = MessagePackCodec.encode(from(a))
@@ -132,9 +131,9 @@ package object msgpack {
   }
 
   private def toMap[A, B](v: MessagePack)(implicit fk: MessagePack => Option[A], fv: MessagePack => Option[B]): Option[Map[A, B]] = v match {
-    case MFixMap(n) => n.toIndexedSeq.map { case (k, v) => fk(k).flatMap(kk => fv(v).map((kk, _))) }.sequence.map(_.toMap)
-    case MMap16(n) => n.toIndexedSeq.map { case (k, v) => fk(k).flatMap(kk => fv(v).map((kk, _))) }.sequence.map(_.toMap)
-    case MMap32(n) => n.toIndexedSeq.map { case (k, v) => fk(k).flatMap(kk => fv(v).map((kk, _))) }.sequence.map(_.toMap)
+    case MFixMap(n) => n.toVector.map { case (k, v) => fk(k).flatMap(kk => fv(v).map((kk, _))) }.sequence.map(_.toMap)
+    case MMap16(n) => n.toVector.map { case (k, v) => fk(k).flatMap(kk => fv(v).map((kk, _))) }.sequence.map(_.toMap)
+    case MMap32(n) => n.toVector.map { case (k, v) => fk(k).flatMap(kk => fv(v).map((kk, _))) }.sequence.map(_.toMap)
     case _ => None
   }
 

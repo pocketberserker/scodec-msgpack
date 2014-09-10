@@ -1,7 +1,6 @@
 package scodec.msgpack
 package codecs
 
-import scala.collection.immutable.IndexedSeq
 import scalaz.NonEmptyList
 import scodec.Codec
 import scodec.bits.{BitVector, ByteVector}
@@ -47,7 +46,7 @@ object MessagePackCodec extends Codec[MessagePack] {
   private val bin16 = variableSizeBytes(uint16, bytes)
   private val bin32 = variableSizeBytesL(uint32, bytes)
 
-  private def unapplyFixArray(m: MessagePack): Option[IndexedSeq[MessagePack]] = m match {
+  private def unapplyFixArray(m: MessagePack): Option[Vector[MessagePack]] = m match {
     case MFixArray(a) => Some(a)
     case _ => None
   }
@@ -55,12 +54,12 @@ object MessagePackCodec extends Codec[MessagePack] {
   private def fixArray: Codec[MessagePack] =
     fixValue(bits(4),  bin"1001", array(uint(4)), MFixArray.apply, unapplyFixArray, "fix aaray")
 
-  private def array(size: Codec[Int]): Codec[IndexedSeq[MessagePack]] =
+  private def array(size: Codec[Int]): Codec[Vector[MessagePack]] =
     new ArrayCodec(size)
 
   private val array16 = array(uint16)
 
-  private def longArray(size: Codec[Long]): Codec[IndexedSeq[MessagePack]] =
+  private def longArray(size: Codec[Long]): Codec[Vector[MessagePack]] =
     new LongArrayCodec(size)
 
   private val array32 = longArray(uint32)

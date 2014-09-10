@@ -1,6 +1,5 @@
 package scodec.msgpack
 
-import scala.collection.immutable.IndexedSeq
 import scodec.bits.ByteVector
 
 sealed abstract class MessagePack
@@ -26,9 +25,9 @@ case class MString32(s: String) extends MessagePack
 case class MBinary8(b: ByteVector) extends MessagePack
 case class MBinary16(b: ByteVector) extends MessagePack
 case class MBinary32(b: ByteVector) extends MessagePack
-case class MFixArray(a: IndexedSeq[MessagePack]) extends MessagePack
-case class MArray16(a: IndexedSeq[MessagePack]) extends MessagePack
-case class MArray32(a: IndexedSeq[MessagePack]) extends MessagePack
+case class MFixArray(a: Vector[MessagePack]) extends MessagePack
+case class MArray16(a: Vector[MessagePack]) extends MessagePack
+case class MArray32(a: Vector[MessagePack]) extends MessagePack
 case class MFixMap(m: Map[MessagePack, MessagePack]) extends MessagePack
 case class MMap16(m: Map[MessagePack, MessagePack]) extends MessagePack
 case class MMap32(m: Map[MessagePack, MessagePack]) extends MessagePack

@@ -1,7 +1,6 @@
 package scodec.msgpack
 package codecs
 
-import scala.collection.immutable.IndexedSeq
 import scodec._
 import scodec.bits.{BitVector, ByteVector}
 import org.scalatest.FlatSpec
@@ -118,18 +117,18 @@ class MessagePackCodecSpec extends FlatSpec with DiagrammedAssertions {
   }
 
   "fix array" should "be able to encode and decode" in {
-    roundtrip(MessagePackCodec, MFixArray(IndexedSeq.empty[MessagePack]))
-    roundtrip(MessagePackCodec, MFixArray(IndexedSeq(MInt8(127))))
+    roundtrip(MessagePackCodec, MFixArray(Vector.empty[MessagePack]))
+    roundtrip(MessagePackCodec, MFixArray(Vector(MInt8(127))))
   }
 
   "array16" should "be able to encode and decode" in {
-    roundtrip(MessagePackCodec, MArray16(IndexedSeq.empty[MessagePack]))
-    roundtrip(MessagePackCodec, MArray16(IndexedSeq(MInt8(127))))
+    roundtrip(MessagePackCodec, MArray16(Vector.empty[MessagePack]))
+    roundtrip(MessagePackCodec, MArray16(Vector(MInt8(127))))
   }
 
   "array32" should "be able to encode and decode" in {
-    roundtrip(MessagePackCodec, MArray32(IndexedSeq.empty[MessagePack]))
-    roundtrip(MessagePackCodec, MArray32(IndexedSeq(MInt8(127))))
+    roundtrip(MessagePackCodec, MArray32(Vector.empty[MessagePack]))
+    roundtrip(MessagePackCodec, MArray32(Vector(MInt8(127))))
   }
 
   "fix map" should "be able to encode and decode" in {

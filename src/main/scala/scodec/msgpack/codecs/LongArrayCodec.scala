@@ -1,18 +1,17 @@
 package scodec.msgpack
 package codecs
 
-import scala.collection.immutable.IndexedSeq
 import scalaz.{\/, \/-, -\/}
-import scalaz.std.indexedSeq._
+import scalaz.std.vector._
 import scalaz.syntax.traverse._
 import scalaz.syntax.std.option._
 import scodec.Codec
 import scodec.bits.BitVector
 
 // FIXME: type conversion
-private[codecs] class LongArrayCodec(size: Codec[Long]) extends Codec[IndexedSeq[MessagePack]] {
+private[codecs] class LongArrayCodec(size: Codec[Long]) extends Codec[Vector[MessagePack]] {
 
-  override def encode(s: IndexedSeq[MessagePack]) = for {
+  override def encode(s: Vector[MessagePack]) = for {
     a <- s.traverseU { v => MessagePackCodec.encode(v) }.map { _.concatenate }
     n <- size.encode(s.length.toLong)
   } yield n ++ a
