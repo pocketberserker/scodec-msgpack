@@ -97,7 +97,7 @@ object MessagePackCodec extends Codec[MessagePack] {
 
   private val byteHead: Codec[MessagePack] =
     discriminated[MessagePack].by(bytes(1))
-    .\ (ByteVector(0xc0)) { case n @ MNil => n } (provide(MNil))
+    .\ (ByteVector(0xc0)) { case n : MNil.type => n } (provide(MNil))
     .\ (ByteVector(0xc2)) { case b @ MBool(false) => b } (provide(MBool(false)))
     .\ (ByteVector(0xc3)) { case b @ MBool(true) => b } (provide(MBool(true)))
     .| (ByteVector(0xc4)) { case MBinary8(b) => b } (MBinary8.apply) (bin8)
