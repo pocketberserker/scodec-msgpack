@@ -36,8 +36,7 @@ class MessagePackSpec extends FlatSpec with DiagrammedAssertions with Checkers {
     check(forAll(genASCII)((s: String) => roundtrip(msgpack.str, s)))
   }
 
-  implicit val to = toInt _
-  implicit val from = fromInt _
+  implicit val intSerializer = Serialize.int
 
   "array" should "be able to encode and decode" in {
     check(forAll((a: Vector[Int]) => roundtrip(msgpack.array, a)))
