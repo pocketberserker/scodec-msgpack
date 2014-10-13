@@ -128,13 +128,13 @@ object MessagePackCodec extends Codec[MessagePack] {
     .| (ByteVector(0xde)) { case MMap16(m) => m } (MMap16.apply) (map16)
     .| (ByteVector(0xdf)) { case MMap32(m) => m } (MMap32.apply) (map32)
 
-  private val msgpack = new ChoiceCodec(NonEmptyList(
+  private val msgpack = choice(
     positiveFixInt,
     negativeFixInt,
     fixStr,
     fixArray,
     fixMap,
-    byteHead))
+    byteHead)
 
   override def encode(m: MessagePack) = msgpack.encode(m)
 
