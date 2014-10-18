@@ -20,6 +20,14 @@ class MessagePackSpec extends TestSuite with Checkers {
     check(forAll((l: Long) => roundtrip(msgpack.long, l)))
   }
 
+  "float" should "be able to encode and decode" in {
+    check(forAll((f: Float) => roundtrip(msgpack.float, f)))
+  }
+
+  "double" should "be able to encode and decode" in {
+    check(forAll((d: Double) => roundtrip(msgpack.double, d)))
+  }
+
   "string" should "be able to encode and decode" in {
     check(forAll(genASCII)((s: String) => roundtrip(msgpack.str, s)))
   }

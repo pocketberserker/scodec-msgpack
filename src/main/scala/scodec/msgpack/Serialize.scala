@@ -64,6 +64,26 @@ object Serialize {
     }
   }
 
+  val float: Serialize[Float] =new Serialize[Float] {
+
+    def pack(v: Float): MessagePack = MFloat32(v)
+
+    def unpack(v: MessagePack): Option[Float] = v match {
+      case MFloat32(n) => n.some
+      case _ => None
+    }
+  }
+
+  val double: Serialize[Double] =new Serialize[Double] {
+
+    def pack(v: Double): MessagePack = MFloat64(v)
+
+    def unpack(v: MessagePack): Option[Double] = v match {
+      case MFloat64(n) => n.some
+      case _ => None
+    }
+  }
+
   val string: Serialize[String] =new Serialize[String] {
     def pack(v: String): MessagePack = {
       val len = v.size

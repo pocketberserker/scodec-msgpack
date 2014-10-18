@@ -18,6 +18,8 @@ package object msgpack {
   val bool: Codec[Boolean] = gen(Serialize.bool)
   val int: Codec[Int] = gen(Serialize.int)
   val long: Codec[Long] = gen(Serialize.long)
+  val float: Codec[Float] = gen(Serialize.float)
+  val double: Codec[Double] = gen(Serialize.double)
   val str: Codec[String] = gen(Serialize.string)
   val bin: Codec[ByteVector] = gen(Serialize.binary)
 
