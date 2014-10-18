@@ -37,5 +37,5 @@ package object msgpack {
         Serialize.map[A, B].unpack(a).map((rest, _)).toRightDisjunction("fail to unpack") }
   }
 
-  // TODO: extended type codec
+  def extended[A : Codec](code: ByteVector): Codec[A] = gen(Serialize.extended(code))
 }

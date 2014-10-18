@@ -6,6 +6,7 @@ import scalaz.syntax.std.option._
 import scalaz.std.vector._
 import scalaz.syntax.std.map._
 import scalaz.syntax.traverse._
+import scodec.Codec
 import scodec.bits.ByteVector
 
 abstract class Serialize[A] {
@@ -148,6 +149,34 @@ object Serialize {
       case MFixMap(n) => n.toVector.map { case (k, v) => S.unpack(k).flatMap(kk => T.unpack(v).map((kk, _))) }.sequence.map(_.toMap)
       case MMap16(n) => n.toVector.map { case (k, v) => S.unpack(k).flatMap(kk => T.unpack(v).map((kk, _))) }.sequence.map(_.toMap)
       case MMap32(n) => n.toVector.map { case (k, v) => S.unpack(k).flatMap(kk => T.unpack(v).map((kk, _))) }.sequence.map(_.toMap)
+      case _ => None
+    }
+  }
+
+  def extended[A](code: ByteVector)(implicit S: Codec[A]): Serialize[A] =new Serialize[A] {
+    def pack(v: A): MessagePack = {
+      // TODO: use S.encode
+      val encoded = S.encodeValid(v).bytes
+      val len = encoded.size
+      if(len <= 1) MFixExtended1(code, encoded)
+      if(len <= 2) MFixExtended2(code, encoded)
+      if(len <= 4) MFixExtended4(code, encoded)
+      if(len <= 8) MFixExtended8(code, encoded)
+      if(len <= 16) MFixExtended16(code, encoded)
+      if(len <= 256) MExtended8(code, encoded)
+      else if(len <= 65536) MExtended16(code, encoded)
+      else MExtended32(code, encoded)
+    }
+
+    def unpack(v: MessagePack): Option[A] = v match {
+      case MFixExtended1(_, value) => S.decodeValue(value.bits).toOption
+      case MFixExtended2(_, value) => S.decodeValue(value.bits).toOption
+      case MFixExtended4(_, value) => S.decodeValue(value.bits).toOption
+      case MFixExtended8(_, value) => S.decodeValue(value.bits).toOption
+      case MFixExtended16(_, value) => S.decodeValue(value.bits).toOption
+      case MExtended8(_, value) => S.decodeValue(value.bits).toOption
+      case MExtended16(_, value) => S.decodeValue(value.bits).toOption
+      case MExtended32(_, value) => S.decodeValue(value.bits).toOption
       case _ => None
     }
   }
