@@ -19,10 +19,10 @@ object Serialize {
 
   val bool: Serialize[Boolean] = new Serialize[Boolean] {
 
-    def pack(v: Boolean): MessagePack = MBool(v)
+    def pack(v: Boolean): MessagePack = if (v) MTrue else MFalse
 
     def unpack(v: MessagePack): Option[Boolean] = v match {
-      case MBool(b) => b.some
+      case m : MBool => m.value.some
       case _ => None
     }
   }
@@ -163,9 +163,9 @@ object Serialize {
       if(len <= 4) MFixExtended4(code, encoded)
       if(len <= 8) MFixExtended8(code, encoded)
       if(len <= 16) MFixExtended16(code, encoded)
-      if(len <= 256) MExtended8(code, encoded)
-      else if(len <= 65536) MExtended16(code, encoded)
-      else MExtended32(code, encoded)
+      if(len <= 256) MExtended8(len, code, encoded)
+      else if(len <= 65536) MExtended16(len, code, encoded)
+      else MExtended32(len.toLong, code, encoded)
     }
 
     def unpack(v: MessagePack): Option[A] = v match {
@@ -174,9 +174,9 @@ object Serialize {
       case MFixExtended4(_, value) => S.decodeValue(value.bits).toOption
       case MFixExtended8(_, value) => S.decodeValue(value.bits).toOption
       case MFixExtended16(_, value) => S.decodeValue(value.bits).toOption
-      case MExtended8(_, value) => S.decodeValue(value.bits).toOption
-      case MExtended16(_, value) => S.decodeValue(value.bits).toOption
-      case MExtended32(_, value) => S.decodeValue(value.bits).toOption
+      case MExtended8(_, _, value) => S.decodeValue(value.bits).toOption
+      case MExtended16(_, _, value) => S.decodeValue(value.bits).toOption
+      case MExtended32(_, _, value) => S.decodeValue(value.bits).toOption
       case _ => None
     }
   }

@@ -9,134 +9,114 @@ import scodec.codecs._
 
 object MessagePackCodec extends Codec[MessagePack] {
 
-  private def fixValue[A](b: Codec[BitVector], head: BitVector, body: Codec[A],
-    apply: A => MessagePack, unapply: MessagePack => Option[A], name: String): Codec[MessagePack] =
-    new FixValueCodec(b, head, body, apply, unapply, name)
+  implicit val positiveFixInt: Codec[MPositiveFixInt] =
+    (constant(bin"0") :: uint(7)).dropUnits.as[MPositiveFixInt]
 
-  private def unapplyPositiveFixInt(m: MessagePack): Option[Int] = m match {
-    case MPositiveFixInt(i) => Some(i)
-    case _ => None
-  }
+  private def mmap(size: Codec[Int]): Codec[Map[MessagePack, MessagePack]] =
+    lazily { new MapCodec(size) }
 
-  private val positiveFixInt = fixValue(bits(1), bin"0", uint(7), MPositiveFixInt.apply, unapplyPositiveFixInt, "positive fix int")
+  implicit val fixMap: Codec[MFixMap] =
+    (constant(bin"1000") :: mmap(uint(4))).dropUnits.as[MFixMap]
 
-  private def unapplyNegativeFixInt(m: MessagePack): Option[Int] = m match {
-    case MNegativeFixInt(i) => Some(i)
-    case _ => None
-  }
+  private def array(size: Codec[Int]): Codec[Vector[MessagePack]] =
+    lazily { new ArrayCodec(size) }
 
-  private val negativeFixInt =
-    fixValue(bits(3), bin"111", uint(5).xmap(_ - 0x20, (a: Int) => a + 0x20), MNegativeFixInt.apply, unapplyNegativeFixInt, "negative fix int")
+  implicit val fixArray: Codec[MFixArray] = (constant(bin"1001") :: array(uint(4))).dropUnits.as[MFixArray]
 
-  private def unapplyFixString(m: MessagePack): Option[String] = m match {
-    case MFixString(i) => Some(i)
-    case _ => None
-  }
+  implicit val fixStr: Codec[MFixString] =
+    (constant(bin"101") :: variableSizeBytes(uint(5), utf8)).dropUnits.as[MFixString]
 
-  private val fixStr = fixValue(bits(3), bin"101", variableSizeBytes(uint(5), utf8), MFixString.apply, unapplyFixString, "fix str")
+  implicit val nil: Codec[MNil.type] = constant(hex"c0") ~> provide(MNil)
+
+  implicit val mFalse: Codec[MFalse.type] = constant(hex"c2") ~> provide(MFalse)
+  implicit val mTrue: Codec[MTrue.type] = constant(hex"c3") ~> provide(MTrue)
+
+  implicit val bin8: Codec[MBinary8] =
+    (constant(hex"c4") :: variableSizeBytes(uint8, bytes)).dropUnits.as[MBinary8]
+  implicit val bin16: Codec[MBinary16] =
+    (constant(hex"d5") :: variableSizeBytes(uint16, bytes)).dropUnits.as[MBinary16]
+  implicit val bin32: Codec[MBinary32] =
+    (constant(hex"c6") :: variableSizeBytesL(uint32, bytes)).dropUnits.as[MBinary32]
+
+  private def extended(size: Codec[Int]) = size.flatPrepend { n => bytes(1) :: bytes(n) }
+
+  implicit val ext8: Codec[MExtended8] =
+    (constant(hex"c7") :: extended(uint8)).dropUnits.as[MExtended8]
+  implicit val ext16: Codec[MExtended16] =
+    (constant(hex"c8") :: extended(uint16)).dropUnits.as[MExtended16]
+
+  // FIXME: type conversion
+  implicit val ext32: Codec[MExtended32] =
+    (constant(hex"c9") :: (uint32.flatPrepend { n => bytes(1) :: bytes(n.toInt) })).dropUnits.as[MExtended32]
+
+  implicit val float32: Codec[MFloat32] =
+    (constant(hex"ca") :: float).dropUnits.as[MFloat32]
+  implicit val float64: Codec[MFloat64] =
+    (constant(hex"cb") :: double).dropUnits.as[MFloat64]
+
+  implicit val muint8: Codec[MUInt8] =
+    (constant(hex"cc") :: uint8).dropUnits.as[MUInt8]
+  implicit val muint16: Codec[MUInt16] =
+    (constant(hex"cd") :: uint16).dropUnits.as[MUInt16]
+  implicit val muint32: Codec[MUInt32] =
+    (constant(hex"ce") :: uint32).dropUnits.as[MUInt32]
+  implicit val muint64: Codec[MUInt64] =
+    (constant(hex"cf") :: ulong(63)).dropUnits.as[MUInt64]
+
+  implicit val mint8: Codec[MInt8] =
+    (constant(hex"d0") :: int8).dropUnits.as[MInt8]
+  implicit val mint16: Codec[MInt16] =
+    (constant(hex"d1") :: int16).dropUnits.as[MInt16]
+  implicit val mint32: Codec[MInt32] =
+    (constant(hex"d2") :: int32).dropUnits.as[MInt32]
+  implicit val mint64: Codec[MInt64] =
+    (constant(hex"d3") :: int64).dropUnits.as[MInt64]
+
+  implicit val fixExt1: Codec[MFixExtended1] =
+    (constant(hex"d4") :: bytes(1) :: bytes(1)).dropUnits.as[MFixExtended1]
+  implicit val fixExt2: Codec[MFixExtended2] =
+    (constant(hex"d5") :: bytes(1) :: bytes(2)).dropUnits.as[MFixExtended2]
+  implicit val fixExt4: Codec[MFixExtended4] =
+    (constant(hex"d6") :: bytes(1) :: bytes(4)).dropUnits.as[MFixExtended4]
+  implicit val fixExt8: Codec[MFixExtended8] =
+    (constant(hex"d7") :: bytes(1) :: bytes(8)).dropUnits.as[MFixExtended8]
+  implicit val fixExt16: Codec[MFixExtended16] =
+    (constant(hex"d8") :: bytes(1) :: bytes(16)).dropUnits.as[MFixExtended16]
 
   private def variableSizeBytesL[A](size: Codec[Long], value: Codec[A]): Codec[A] =
     new VariableLongSizeBytesCodec(size, value)
 
-  private val str8 = variableSizeBytes(uint8, utf8)
-  private val str16 = variableSizeBytes(uint16, utf8)
-  private val str32 = variableSizeBytesL(uint32, utf8)
+  implicit val str8: Codec[MString8] =
+    (constant(hex"d9") :: variableSizeBytes(uint8, utf8)).dropUnits.as[MString8]
+  implicit val str16: Codec[MString16] =
+    (constant(hex"da") :: variableSizeBytes(uint16, utf8)).dropUnits.as[MString16]
+  implicit val str32: Codec[MString32] =
+    (constant(hex"db") :: variableSizeBytesL(uint32, utf8)).dropUnits.as[MString32]
 
-  private val bin8 = variableSizeBytes(uint8, bytes)
-  private val bin16 = variableSizeBytes(uint16, bytes)
-  private val bin32 = variableSizeBytesL(uint32, bytes)
-
-  private def unapplyFixArray(m: MessagePack): Option[Vector[MessagePack]] = m match {
-    case MFixArray(a) => Some(a)
-    case _ => None
-  }
-
-  private def fixArray: Codec[MessagePack] =
-    fixValue(bits(4),  bin"1001", array(uint(4)), MFixArray.apply, unapplyFixArray, "fix aaray")
-
-  private def array(size: Codec[Int]): Codec[Vector[MessagePack]] =
-    new ArrayCodec(size)
-
-  private val array16 = array(uint16)
+  implicit val array16: Codec[MArray16] =
+    (constant(hex"dc") :: array(uint16)).dropUnits.as[MArray16]
 
   private def longArray(size: Codec[Long]): Codec[Vector[MessagePack]] =
-    new LongArrayCodec(size)
+    lazily { new LongArrayCodec(size) }
 
-  private val array32 = longArray(uint32)
+  implicit val array32: Codec[MArray32] =
+    (constant(hex"dd") :: longArray(uint32)).dropUnits.as[MArray32]
 
-  private def unapplyFixMap(m: MessagePack): Option[Map[MessagePack, MessagePack]] = m match {
-    case MFixMap(m) => Some(m)
-    case _ => None
-  }
-
-  private val fixMap: Codec[MessagePack] =
-    fixValue(bits(4),  bin"1000", mmap(uint(4)), MFixMap.apply, unapplyFixMap, "fix map")
-
-  private def mmap(size: Codec[Int]): Codec[Map[MessagePack, MessagePack]] =
-    new MapCodec(size)
-
-  private val map16 = mmap(uint16)
+  implicit val map16: Codec[MMap16] =
+    (constant(hex"de") :: mmap(uint16)).dropUnits.as[MMap16]
 
   private def longMap(size: Codec[Long]): Codec[Map[MessagePack, MessagePack]] =
-    new LongMapCodec(size)
+    lazily { new LongMapCodec(size) }
 
-  private val map32 = longMap(uint32)
+  implicit val map32: Codec[MMap32] =
+    (constant(hex"df") :: longMap(uint32)).dropUnits.as[MMap32]
 
-  private val fixExt1 = bytes(1) ~ bytes(1)
-  private val fixExt2 = bytes(1) ~ bytes(2)
-  private val fixExt4 = bytes(1) ~ bytes(4)
-  private val fixExt8 = bytes(1) ~ bytes(8)
-  private val fixExt16 = bytes(1) ~ bytes(16)
+  implicit val negativeFixInt: Codec[MNegativeFixInt] =
+    (constant(bin"111") :: uint(5).xmap(_ - 0x20, (a: Int) => a + 0x20)).dropUnits.as[MNegativeFixInt]
 
-  private def extended(size: Codec[Int]): Codec[(ByteVector, ByteVector)] = new ExtendedValueCodec(size)
+  private val codec: Codec[MessagePack] =
+    scodec.codecs.lazily { Codec.coproduct[MessagePack].choice }
 
-  private val ext8 = extended(uint8)
-  private val ext16 = extended(uint16)
-  private val ext32 = new LongExtendedValueCodec(uint32)
-
-  private val byteHead: Codec[MessagePack] =
-    discriminated[MessagePack].by(bytes(1))
-    .\ (ByteVector(0xc0)) { case n : MNil.type => n } (provide(MNil))
-    .\ (ByteVector(0xc2)) { case b @ MBool(false) => b } (provide(MBool(false)))
-    .\ (ByteVector(0xc3)) { case b @ MBool(true) => b } (provide(MBool(true)))
-    .| (ByteVector(0xc4)) { case MBinary8(b) => b } (MBinary8.apply) (bin8)
-    .| (ByteVector(0xc5)) { case MBinary16(b) => b } (MBinary16.apply) (bin16)
-    .| (ByteVector(0xc6)) { case MBinary32(b) => b } (MBinary32.apply) (bin32)
-    .| (ByteVector(0xc7)) { case MExtended8(c, d) => (c, d) } (MExtended8.apply) (ext8)
-    .| (ByteVector(0xc8)) { case MExtended16(c, d) => (c, d) } (MExtended16.apply) (ext16)
-    .| (ByteVector(0xc9)) { case MExtended32(c, d) => (c, d) } (MExtended32.apply) (ext32)
-    .| (ByteVector(0xca)) { case MFloat32(n) => n } (MFloat32.apply) (float)
-    .| (ByteVector(0xcb)) { case MFloat64(n) => n } (MFloat64.apply) (double)
-    .| (ByteVector(0xcc)) { case MUInt8(n) => n } (MUInt8.apply) (uint8)
-    .| (ByteVector(0xcd)) { case MUInt16(n) => n } (MUInt16.apply) (uint16)
-    .| (ByteVector(0xce)) { case MUInt32(n) => n } (MUInt32.apply) (uint32)
-    .| (ByteVector(0xcf)) { case MUInt64(n) => n } (MUInt64.apply) (ulong(63))
-    .| (ByteVector(0xd0)) { case MInt8(n) => n } (MInt8.apply) (int8)
-    .| (ByteVector(0xd1)) { case MInt16(n) => n } (MInt16.apply) (int16)
-    .| (ByteVector(0xd2)) { case MInt32(n) => n } (MInt32.apply) (int32)
-    .| (ByteVector(0xd3)) { case MInt64(n) => n } (MInt64.apply) (int64)
-    .| (ByteVector(0xd4)) { case MFixExtended1(c, d) => (c, d) } (MFixExtended1.apply) (fixExt1)
-    .| (ByteVector(0xd5)) { case MFixExtended2(c, d) => (c, d) } (MFixExtended2.apply) (fixExt2)
-    .| (ByteVector(0xd6)) { case MFixExtended4(c, d) => (c, d) } (MFixExtended4.apply) (fixExt4)
-    .| (ByteVector(0xd7)) { case MFixExtended8(c, d) => (c, d) } (MFixExtended8.apply) (fixExt8)
-    .| (ByteVector(0xd8)) { case MFixExtended16(c, d) => (c, d) } (MFixExtended16.apply) (fixExt16)
-    .| (ByteVector(0xd9)) { case MString8(s) => s } (MString8.apply) (str8)
-    .| (ByteVector(0xda)) { case MString16(s) => s } (MString16.apply) (str16)
-    .| (ByteVector(0xdb)) { case MString32(s) => s } (MString32.apply) (str32)
-    .| (ByteVector(0xdc)) { case MArray16(a) => a } (MArray16.apply) (array16)
-    .| (ByteVector(0xdd)) { case MArray32(a) => a } (MArray32.apply) (array32)
-    .| (ByteVector(0xde)) { case MMap16(m) => m } (MMap16.apply) (map16)
-    .| (ByteVector(0xdf)) { case MMap32(m) => m } (MMap32.apply) (map32)
-
-  private val msgpack = choice(
-    positiveFixInt,
-    negativeFixInt,
-    fixStr,
-    fixArray,
-    fixMap,
-    byteHead)
-
-  override def encode(m: MessagePack) = msgpack.encode(m)
-
-  override def decode(m: BitVector) = msgpack.decode(m)
+  def encode(m: MessagePack) = codec.encode(m)
+  def decode(m: BitVector) = codec.decode(m)
 }

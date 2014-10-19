@@ -4,15 +4,16 @@ package codecs
 import scalaz.{\/, \/-, -\/}
 import scalaz.syntax.either._
 import scalaz.syntax.std.option._
-import scodec.Codec
+import scodec.{Codec, Err}
 import scodec.bits.BitVector
 
 private[codecs] class LongMapCodec(size: Codec[Long]) extends Codec[Map[MessagePack, MessagePack]] {
 
-  val pair = MessagePackCodec ~ MessagePackCodec
+  def pair: Codec[(MessagePack, MessagePack)] =
+    scodec.codecs.lazily { MessagePackCodec ~ MessagePackCodec }
 
   override def encode(m: Map[MessagePack, MessagePack]) = for {
-    a <- m.foldLeft(BitVector.empty.right[String])((acc, p) => acc match {
+    a <- m.foldLeft(BitVector.empty.right[Err])((acc, p) => acc match {
       case -\/(_) => pair.encode(p)
       case \/-(v) => pair.encode(p).map(v ++ _)
       })
@@ -23,7 +24,7 @@ private[codecs] class LongMapCodec(size: Codec[Long]) extends Codec[Map[MessageP
     size.decode(buffer).flatMap { case (r, n) => {
       val builder = Map.newBuilder[MessagePack, MessagePack]
       var remaining = r
-      var error: Option[String] = None
+      var error: Option[Err] = None
       for(_ <- 0 to n.toInt - 1) {
         pair.decode(remaining) match {
           case \/-((rest, (k, v))) =>

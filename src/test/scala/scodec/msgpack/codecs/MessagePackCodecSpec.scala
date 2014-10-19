@@ -10,8 +10,8 @@ class MessagePackCodecSpec extends TestSuite {
   }
 
   "bool" should "be able to encode and decode" in {
-    roundtrip(MessagePackCodec, MBool(true))
-    roundtrip(MessagePackCodec, MBool(false))
+    roundtrip(MessagePackCodec, MTrue)
+    roundtrip(MessagePackCodec, MFalse)
   }
 
   "positive fix int" should "be able to encode and decode" in {
