@@ -8,7 +8,7 @@ object ScodecMsgPackBuild extends Build {
   lazy val buildSettings = Defaults.defaultSettings ++
     Revolver.settings ++
     Seq(
-      scalaVersion := "2.11.2",
+      scalaVersion := "2.11.4",
       crossScalaVersions := Seq("2.10.4", scalaVersion.value),
       resolvers += Resolver.sonatypeRepo("releases"),
       resolvers += "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases",
