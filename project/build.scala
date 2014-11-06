@@ -27,7 +27,7 @@ object ScodecMsgPackBuild extends Build {
 
   object Dependencies {
 
-    val scodec = "org.typelevel" %% "scodec-core" % "1.4.0"
+    val scodec = "org.typelevel" %% "scodec-core" % "1.5.0"
     val scalatest = "org.scalatest" %% "scalatest" % "2.2.2"
     val scalacheck = "org.scalacheck" %% "scalacheck" % "1.11.6"
   }
