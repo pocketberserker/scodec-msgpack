@@ -1,6 +1,5 @@
 package scodec.msgpack
 
-import scalaz._
 import scalaz.std.option._
 import scalaz.syntax.std.option._
 import scalaz.std.vector._
