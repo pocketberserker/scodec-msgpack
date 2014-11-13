@@ -2,11 +2,7 @@ package scodec
 package msgpack
 package examples
 
-import scodec.codecs._
-import org.scalacheck.Prop._
-import org.scalacheck.Arbitrary._
 import org.scalatest.prop.Checkers
-import MessagePackArbitrary._
 
 class JsonStyleExample extends TestSuite {
 

@@ -2,9 +2,7 @@ package scodec
 
 import scalaz.\/
 import scalaz.syntax.std.option._
-import scalaz.syntax.std.map._
 import scodec.bits.{BitVector, ByteVector}
-import scodec._
 
 package object msgpack {
 
