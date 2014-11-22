@@ -61,7 +61,7 @@ object MessagePackCodec extends Codec[MessagePack] {
   implicit val muint32: Codec[MUInt32] =
     (constant(hex"ce") :: uint32).dropUnits.as[MUInt32]
   implicit val muint64: Codec[MUInt64] =
-    (constant(hex"cf") :: ulong(63)).dropUnits.as[MUInt64]
+    (constant(hex"cf") :: long(64)).dropUnits.as[MUInt64]
 
   implicit val mint8: Codec[MInt8] =
     (constant(hex"d0") :: int8).dropUnits.as[MInt8]
