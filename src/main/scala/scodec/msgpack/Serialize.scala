@@ -28,20 +28,31 @@ object Serialize {
 
   val int: Serialize[Int] =new Serialize[Int] {
 
+    // This implementation refer to msgpack-java (Apache License version 2.0).
+    // https://github.com/msgpack/msgpack-java/blob/bd9b4f20597111775120546de41dd3f9d01b9616/msgpack-core/src/main/java/org/msgpack/core/MessagePacker.java#L253
+    // Change log: fix indent and return values.
     def pack(v: Int): MessagePack =
-      if(v >= 0 && v <= 127) MPositiveFixInt(v)
-      else if(v >= 0 && v <= 255) MUInt8(v)
-      else if(v >= 0 && v <= 65535) MUInt16(v)
-      else if(v >= -32 && v <= -1) MNegativeFixInt(v)
-      else if(v >= -128 && v < 0) MInt8(v)
-      else if(v >= -32768 && v < 0) MInt16(v)
-      else MInt32(v)
+      if (v < -(1 << 5)) {
+        if (v < -(1 << 15)) MInt32(v)
+        else if (v < -(1 << 7)) MInt16(v)
+        else MInt8(v)
+      }
+      else if (v < (1 << 7)) {
+        if (v >= 0) MPositiveFixInt(v)
+        else MNegativeFixInt(v)
+      }
+      else {
+        if (v < (1 << 8)) MUInt8(v)
+        else if (v < (1 << 16)) MUInt16(v)
+        else MUInt32(v)
+      }
 
     def unpack(v: MessagePack): Option[Int] = v match {
       case MPositiveFixInt(n) => n.some
       case MNegativeFixInt(n) => n.some
       case MUInt8(n) => n.some
       case MUInt16(n) => n.some
+      case MUInt32(n) => n.toInt.some
       case MInt8(n) => n.some
       case MInt16(n) => n.some
       case MInt32(n) => n.some
@@ -51,14 +62,45 @@ object Serialize {
 
   val long: Serialize[Long] =new Serialize[Long] {
 
+    // This implementation refer to msgpack-java (Apache License version 2.0).
+    // https://github.com/msgpack/msgpack-java/blob/bd9b4f20597111775120546de41dd3f9d01b9616/msgpack-core/src/main/java/org/msgpack/core/MessagePacker.java#L277
+    // Change log: fix indent and return values.
     def pack(v: Long): MessagePack =
-      if(v >= 0L && v <= 4294967295L) MUInt32(v)
-      else if(v >= 0L) MUInt64(v)
-      else MInt64(v)
+      if (v < -(1L << 5)) {
+        if (v < -(1L << 15)) {
+          if (v < -(1L << 31)) MInt64(v)
+          else  MInt32(v.toInt)
+        }
+        else {
+          if (v < -(1 << 7)) MInt16(v.toInt)
+          else MInt8(v.toInt)
+        }
+      }
+      else if (v < (1 << 7)) {
+        if (v >= 0) MPositiveFixInt(v.toInt)
+        else MNegativeFixInt(v.toInt)
+      }
+      else {
+        if (v < (1L << 16)) {
+          if (v < (1 << 8)) MUInt8(v.toInt)
+          else MUInt16(v.toInt)
+        }
+        else {
+          if (v < (1L << 32)) MUInt32(v.toInt)
+          else MUInt64(v)
+        }
+      }
 
     def unpack(v: MessagePack): Option[Long] = v match {
+      case MPositiveFixInt(n) => n.toLong.some
+      case MNegativeFixInt(n) => n.toLong.some
+      case MUInt8(n) => n.toLong.some
+      case MUInt16(n) => n.toLong.some
       case MUInt32(n) => n.some
       case MUInt64(n) => n.some
+      case MInt8(n) => n.toLong.some
+      case MInt16(n) => n.toLong.some
+      case MInt32(n) => n.toLong.some
       case MInt64(n) => n.some
       case _ => None
     }
