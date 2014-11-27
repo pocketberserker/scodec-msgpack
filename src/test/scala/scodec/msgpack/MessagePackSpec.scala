@@ -4,7 +4,6 @@ package msgpack
 import org.scalacheck.Prop._
 import org.scalacheck.Arbitrary._
 import org.scalatest.prop.Checkers
-import MessagePackArbitrary._
 
 class MessagePackSpec extends TestSuite with Checkers {
 
@@ -34,8 +33,8 @@ class MessagePackSpec extends TestSuite with Checkers {
   }
 
   "string" should "be able to encode and decode" in {
-    check(forAll(genASCII)((s: String) => roundtrip(msgpack.str, s)))
-    check(forAll(genASCII)((s: String) => roundtripWithJava(s)))
+    check(forAll((s: String) => roundtrip(msgpack.str, s)))
+    check(forAll((s: String) => roundtripWithJava(s)))
   }
 
   implicit val intSerializer = Serialize.int

@@ -128,7 +128,7 @@ object Serialize {
 
   val string: Serialize[String] =new Serialize[String] {
     def pack(v: String): MessagePack = {
-      val len = v.size
+      val len = v.getBytes("UTF-8").length
       if(len <= 31) MFixString(v)
       else if(len <= 255) MString8(v)
       else if(len <= 65535) MString16(v)
