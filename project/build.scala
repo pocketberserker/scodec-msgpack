@@ -52,7 +52,12 @@ object ScodecMsgPackBuild extends Build {
       commitNextVersion,
       pushChanges
     ),
+    credentials ++= PartialFunction.condOpt(sys.env.get("SONATYPE_USER") -> sys.env.get("SONATYPE_PASS")){
+      case (Some(user), Some(pass)) =>
+        Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", user, pass)
+    }.toList,
     organization := "com.github.pocketberserker",
+    homepage := Some(url("https://github.com/pocketberserker/scodec-msgpack")),
     licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
     pomExtra :=
       <developers>
@@ -65,7 +70,7 @@ object ScodecMsgPackBuild extends Build {
       <scm>
         <url>git@github.com:pocketberserker/scodec-msgpack.git</url>
         <connection>scm:git:git@github.com:pocketberserker/scodec-msgpack.git</connection>
-        <tag>{ "v" + version.value }</tag>
+        <tag>if(isSnapshot.value) gitHash else { "v" + version.value }</tag>
       </scm>
     ,
     description := "yet another msgpack implementation"
