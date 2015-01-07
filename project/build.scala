@@ -8,6 +8,10 @@ import com.typesafe.sbt.pgp.PgpKeys
 object ScodecMsgPackBuild extends Build {
   import Dependencies._
 
+  private def gitHash: String = scala.util.Try(
+    sys.process.Process("git rev-parse HEAD").lines_!.head
+  ).getOrElse("master")
+
   lazy val buildSettings = Seq(
     ReleasePlugin.releaseSettings,
     sonatypeSettings
@@ -70,7 +74,7 @@ object ScodecMsgPackBuild extends Build {
       <scm>
         <url>git@github.com:pocketberserker/scodec-msgpack.git</url>
         <connection>scm:git:git@github.com:pocketberserker/scodec-msgpack.git</connection>
-        <tag>if(isSnapshot.value) gitHash else { "v" + version.value }</tag>
+        <tag>{if(isSnapshot.value) gitHash else { "v" + version.value }}</tag>
       </scm>
     ,
     description := "yet another msgpack implementation",
