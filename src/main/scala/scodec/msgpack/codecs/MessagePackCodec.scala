@@ -1,7 +1,6 @@
 package scodec.msgpack
 package codecs
 
-import scalaz.NonEmptyList
 import scodec.Codec
 import scodec.bits.{BitVector, ByteVector}
 import scodec.bits._
@@ -13,13 +12,16 @@ object MessagePackCodec extends Codec[MessagePack] {
     (constant(bin"0") :: uint(7)).dropUnits.as[MPositiveFixInt]
 
   private def mmap(size: Codec[Int]): Codec[Map[MessagePack, MessagePack]] =
-    lazily { new MapCodec(size) }
+    lazily {
+      vectorOfN(size, MessagePackCodec ~ MessagePackCodec)
+        .xmap(vec => vec.toMap, m => m.toVector)
+    }
 
   implicit val fixMap: Codec[MFixMap] =
     (constant(bin"1000") :: mmap(uint(4))).dropUnits.as[MFixMap]
 
   private def array(size: Codec[Int]): Codec[Vector[MessagePack]] =
-    lazily { new ArrayCodec(size) }
+    lazily { vectorOfN(size, MessagePackCodec) }
 
   implicit val fixArray: Codec[MFixArray] = (constant(bin"1001") :: array(uint(4))).dropUnits.as[MFixArray]
 
@@ -96,8 +98,9 @@ object MessagePackCodec extends Codec[MessagePack] {
   implicit val array16: Codec[MArray16] =
     (constant(hex"dc") :: array(uint16)).dropUnits.as[MArray16]
 
+  // FIXME: type conversion
   private def longArray(size: Codec[Long]): Codec[Vector[MessagePack]] =
-    lazily { new LongArrayCodec(size) }
+    lazily { vectorOfN(size.xmap(_.toInt, _.toLong), MessagePackCodec) }
 
   implicit val array32: Codec[MArray32] =
     (constant(hex"dd") :: longArray(uint32)).dropUnits.as[MArray32]
@@ -106,7 +109,12 @@ object MessagePackCodec extends Codec[MessagePack] {
     (constant(hex"de") :: mmap(uint16)).dropUnits.as[MMap16]
 
   private def longMap(size: Codec[Long]): Codec[Map[MessagePack, MessagePack]] =
-    lazily { new LongMapCodec(size) }
+    lazily {
+      vectorOfN(
+        size.xmap(_.toInt, _.toLong),
+        MessagePackCodec ~ MessagePackCodec)
+        .xmap(_.toMap, _.toVector)
+    }
 
   implicit val map32: Codec[MMap32] =
     (constant(hex"df") :: longMap(uint32)).dropUnits.as[MMap32]

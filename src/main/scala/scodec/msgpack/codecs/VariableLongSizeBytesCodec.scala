@@ -15,5 +15,5 @@ private[codecs] class VariableLongSizeBytesCodec[A](size: Codec[Long], value: Co
   } yield encodeSize ++ encodeA
 
   override def decode(buffer: BitVector) =
-    size.flatZip(sz => fixedSizeBits(sz.toInt, value)).decode(buffer).map { case (rest, (sz, v)) => (rest, v) }
+    size.flatZip(sz => fixedSizeBits(sz.toInt, value)).decode(buffer).map(_.map(_._2))
 }

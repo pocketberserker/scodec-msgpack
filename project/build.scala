@@ -36,10 +36,17 @@ object ScodecMsgPackBuild extends Build {
     },
     libraryDependencies ++= Seq(
       scodec,
+      scalaz,
       scalatest % "test",
       msgpackJava % "test",
       scalacheck % "test"
     ),
+    libraryDependencies ++= {
+     if (scalaBinaryVersion.value startsWith "2.10")
+       Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full))
+     else
+       Nil
+    },
     ReleasePlugin.ReleaseKeys.releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,
@@ -98,7 +105,8 @@ object ScodecMsgPackBuild extends Build {
 
   object Dependencies {
 
-    val scodec = "org.typelevel" %% "scodec-core" % "1.6.0"
+    val scodec = "org.scodec" %% "scodec-core" % "1.7.0-RC1"
+    val scalaz = "org.scalaz" %% "scalaz-core" % "7.1.0"
     val scalatest = "org.scalatest" %% "scalatest" % "2.2.2"
     val scalacheck = "org.scalacheck" %% "scalacheck" % "1.12.1"
     val msgpackJava = "org.msgpack" % "msgpack-core" % "0.7.0-p4"

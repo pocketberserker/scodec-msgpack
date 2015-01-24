@@ -1,22 +1,22 @@
 package scodec.msgpack
 
 import scodec._
+import Attempt._
 import scodec.bits.BitVector
 import org.scalatest.FlatSpec
 import org.scalatest.DiagrammedAssertions
-import scalaz.{\/-, -\/}
 
 abstract class TestSuite extends FlatSpec with DiagrammedAssertions {
 
   def roundtrip[A](codec: Codec[A], a: A) = {
     codec.encode(a) match {
-      case -\/(error) =>
+      case Failure(error) =>
         fail(error.toString())
-      case \/-(encoded) =>
+      case Successful(encoded) =>
         codec.decode(encoded) match {
-          case -\/(error) =>
+          case Failure(error) =>
             fail(error.toString())
-          case \/-((remainder, decoded)) =>
+          case Successful(DecodeResult(decoded, remainder)) =>
             assert(remainder === BitVector.empty)
             assert(decoded === a)
             decoded === a

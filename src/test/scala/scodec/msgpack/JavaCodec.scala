@@ -1,10 +1,10 @@
 package scodec.msgpack
 
+import scala.util.control.NonFatal
 import java.io.ByteArrayOutputStream
 import org.msgpack.core.{MessagePack => JMessagePack, MessagePacker, MessageUnpacker}
-import scodec.{Codec, Err}
+import scodec._
 import scodec.bits.BitVector
-import scalaz.{\/-, \/}
 
 object JavaCodec {
 
@@ -12,19 +12,25 @@ object JavaCodec {
     JMessagePack.newDefaultUnpacker(bits.toByteArray)
   }
 
-  def withPacker(f: MessagePacker => Unit): Err \/ BitVector = {
+  def withPacker(f: MessagePacker => Unit): Attempt[BitVector] = {
     val out = new ByteArrayOutputStream()
     val packer = JMessagePack.newDefaultPacker(out)
     f(packer)
     packer.close
-    \/-(BitVector(out.toByteArray))
+    Attempt.successful(BitVector(out.toByteArray))
   }
 
-  def withUnpacker[A](f: MessageUnpacker => A): BitVector => (Err \/ (BitVector, A)) =
+  def fromTryCatchNonFatal[A](a: => DecodeResult[A]): Attempt[DecodeResult[A]] = try {
+    Attempt.successful(a)
+  } catch {
+    case NonFatal(t) => Attempt.failure(Err.apply(t.toString))
+  }
+
+  def withUnpacker[A](f: MessageUnpacker => A): BitVector => Attempt[DecodeResult[A]] =
     bitVector2Unpacker.andThen { unpacker =>
-      val result = \/.fromTryCatchNonFatal(
-        BitVector.empty -> f(unpacker)
-      ).leftMap(e => Err.apply(e.toString))
+      val result = fromTryCatchNonFatal(
+        DecodeResult(f(unpacker), BitVector.empty)
+      )
       unpacker.close()
       result
     }

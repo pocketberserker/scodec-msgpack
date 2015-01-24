@@ -196,8 +196,8 @@ object Serialize {
 
   def extended[A](code: ByteVector)(implicit S: Codec[A]): Serialize[A] =new Serialize[A] {
     def pack(v: A): MessagePack = {
-      // TODO: use S.encode
-      val encoded = S.encodeValid(v).bytes
+      // TODO: do not use 'require'
+      val encoded = S.encode(v).require.bytes
       val len = encoded.size
       if(len <= 1) MFixExtended1(code, encoded)
       if(len <= 2) MFixExtended2(code, encoded)
@@ -210,14 +210,14 @@ object Serialize {
     }
 
     def unpack(v: MessagePack): Option[A] = v match {
-      case MFixExtended1(_, value) => S.decodeValue(value.bits).toOption
-      case MFixExtended2(_, value) => S.decodeValue(value.bits).toOption
-      case MFixExtended4(_, value) => S.decodeValue(value.bits).toOption
-      case MFixExtended8(_, value) => S.decodeValue(value.bits).toOption
-      case MFixExtended16(_, value) => S.decodeValue(value.bits).toOption
-      case MExtended8(_, _, value) => S.decodeValue(value.bits).toOption
-      case MExtended16(_, _, value) => S.decodeValue(value.bits).toOption
-      case MExtended32(_, _, value) => S.decodeValue(value.bits).toOption
+      case MFixExtended1(_, value) => S.decode(value.bits).map(_.value).toOption
+      case MFixExtended2(_, value) => S.decode(value.bits).map(_.value).toOption
+      case MFixExtended4(_, value) => S.decode(value.bits).map(_.value).toOption
+      case MFixExtended8(_, value) => S.decode(value.bits).map(_.value).toOption
+      case MFixExtended16(_, value) => S.decode(value.bits).map(_.value).toOption
+      case MExtended8(_, _, value) => S.decode(value.bits).map(_.value).toOption
+      case MExtended16(_, _, value) => S.decode(value.bits).map(_.value).toOption
+      case MExtended32(_, _, value) => S.decode(value.bits).map(_.value).toOption
       case _ => None
     }
   }
