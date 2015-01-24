@@ -10,7 +10,7 @@ object ScodecMsgPackBuild extends Build {
 
   private def gitHash: String = scala.util.Try(
     sys.process.Process("git rev-parse HEAD").lines_!.head
-  ).getOrElse("master")
+  ).getOrElse("series/0.1.x")
 
   lazy val buildSettings = Seq(
     ReleasePlugin.releaseSettings,
