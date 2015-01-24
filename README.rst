@@ -1,7 +1,8 @@
 Scodec MessagePack
 ===================
 
-[![Build Status](https://travis-ci.org/pocketberserker/scodec-msgpack.svg?branch=series%2F0.1.x)](https://travis-ci.org/pocketberserker/scodec-msgpack)
+.. image:: https://travis-ci.org/pocketberserker/scodec-msgpack.svg?branch=series%2F0.1.x
+    :target: https://travis-ci.org/pocketberserker/scodec-msgpack
 
 scodec-msgpack is a yet another `MessagePack <http://msgpack.org/>`_ Scala implementation.
 
