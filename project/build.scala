@@ -36,7 +36,6 @@ object ScodecMsgPackBuild extends Build {
     },
     libraryDependencies ++= Seq(
       scodec,
-      scalaz,
       scalatest % "test",
       msgpackJava % "test",
       scalacheck % "test"
@@ -106,7 +105,6 @@ object ScodecMsgPackBuild extends Build {
   object Dependencies {
 
     val scodec = "org.scodec" %% "scodec-core" % "1.7.0-RC1"
-    val scalaz = "org.scalaz" %% "scalaz-core" % "7.1.0"
     val scalatest = "org.scalatest" %% "scalatest" % "2.2.2"
     val scalacheck = "org.scalacheck" %% "scalacheck" % "1.12.1"
     val msgpackJava = "org.msgpack" % "msgpack-core" % "0.7.0-p4"
