@@ -38,7 +38,7 @@ object MessagePackCodec extends Codec[MessagePack] {
   implicit val bin16: Codec[MBinary16] =
     (constant(hex"d5") :: variableSizeBytes(uint16, bytes)).dropUnits.as[MBinary16]
   implicit val bin32: Codec[MBinary32] =
-    (constant(hex"c6") :: variableSizeBytesL(uint32, bytes)).dropUnits.as[MBinary32]
+    (constant(hex"c6") :: variableSizeBytesLong(uint32, bytes)).dropUnits.as[MBinary32]
 
   private def extended(size: Codec[Int]) = size.flatPrepend { n => bytes(1) :: bytes(n) }
 
@@ -85,15 +85,12 @@ object MessagePackCodec extends Codec[MessagePack] {
   implicit val fixExt16: Codec[MFixExtended16] =
     (constant(hex"d8") :: bytes(1) :: bytes(16)).dropUnits.as[MFixExtended16]
 
-  private def variableSizeBytesL[A](size: Codec[Long], value: Codec[A]): Codec[A] =
-    new VariableLongSizeBytesCodec(size, value)
-
   implicit val str8: Codec[MString8] =
     (constant(hex"d9") :: variableSizeBytes(uint8, utf8)).dropUnits.as[MString8]
   implicit val str16: Codec[MString16] =
     (constant(hex"da") :: variableSizeBytes(uint16, utf8)).dropUnits.as[MString16]
   implicit val str32: Codec[MString32] =
-    (constant(hex"db") :: variableSizeBytesL(uint32, utf8)).dropUnits.as[MString32]
+    (constant(hex"db") :: variableSizeBytesLong(uint32, utf8)).dropUnits.as[MString32]
 
   implicit val array16: Codec[MArray16] =
     (constant(hex"dc") :: array(uint16)).dropUnits.as[MArray16]
