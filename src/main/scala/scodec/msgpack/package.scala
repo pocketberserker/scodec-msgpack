@@ -7,12 +7,10 @@ package object msgpack {
   import codecs.MessagePackCodec
 
   private def gen[A](s: Serialize[A]): Codec[A] = new Codec[A] {
-    def encode(a: A): Attempt[BitVector] = MessagePackCodec.encode(s.pack(a))
+    def encode(a: A): Attempt[BitVector] = s.pack(a).flatMap(MessagePackCodec.encode)
     def decode(buffer: BitVector): Attempt[DecodeResult[A]] =
       MessagePackCodec.decode(buffer).flatMap {
-        case DecodeResult(a, rest) =>
-          Attempt.fromOption(
-            s.unpack(a).map(DecodeResult(_, rest)), Err("fail to unpack"))
+        case DecodeResult(a, rest) => s.unpack(a).map(DecodeResult(_, rest))
       }
   }
 
@@ -25,22 +23,18 @@ package object msgpack {
   val bin: Codec[ByteVector] = gen(Serialize.binary)
 
   def array[A : Serialize]: Codec[Vector[A]] = new Codec[Vector[A]] {
-    def encode(a: Vector[A]): Attempt[BitVector] = MessagePackCodec.encode(Serialize.array.pack(a))
+    def encode(a: Vector[A]): Attempt[BitVector] = Serialize.array.pack(a).flatMap(MessagePackCodec.encode)
     def decode(buffer: BitVector): Attempt[DecodeResult[Vector[A]]] =
       MessagePackCodec.decode(buffer).flatMap {
-        case DecodeResult(a, rest) =>
-          Attempt.fromOption(
-            Serialize.array.unpack(a).map(DecodeResult(_, rest)), Err("fail to unpack"))
+        case DecodeResult(a, rest) => Serialize.array.unpack(a).map(DecodeResult(_, rest))
       }
   }
 
   def map[A : Serialize, B : Serialize]: Codec[Map[A, B]] = new Codec[Map[A, B]] {
-    def encode(a: Map[A, B]): Attempt[BitVector] = MessagePackCodec.encode(Serialize.map[A, B].pack(a))
+    def encode(a: Map[A, B]): Attempt[BitVector] = Serialize.map[A, B].pack(a).flatMap(MessagePackCodec.encode)
     def decode(buffer: BitVector): Attempt[DecodeResult[Map[A, B]]] =
       MessagePackCodec.decode(buffer).flatMap {
-        case DecodeResult(a, rest) =>
-          Attempt.fromOption(
-            Serialize.map[A, B].unpack(a).map(DecodeResult(_, rest)), Err("fail to unpack"))
+        case DecodeResult(a, rest) => Serialize.map[A, B].unpack(a).map(DecodeResult(_, rest))
       }
   }
 
