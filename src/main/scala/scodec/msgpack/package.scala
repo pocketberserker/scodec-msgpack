@@ -12,6 +12,7 @@ package object msgpack {
       MessagePackCodec.decode(buffer).flatMap {
         case DecodeResult(a, rest) => s.unpack(a).map(DecodeResult(_, rest))
       }
+    def sizeBound = MessagePackCodec.sizeBound
   }
 
   val bool: Codec[Boolean] = gen(Serialize.bool)
@@ -28,6 +29,7 @@ package object msgpack {
       MessagePackCodec.decode(buffer).flatMap {
         case DecodeResult(a, rest) => Serialize.array.unpack(a).map(DecodeResult(_, rest))
       }
+    def sizeBound = MessagePackCodec.sizeBound
   }
 
   def map[A : Serialize, B : Serialize]: Codec[Map[A, B]] = new Codec[Map[A, B]] {
@@ -36,6 +38,7 @@ package object msgpack {
       MessagePackCodec.decode(buffer).flatMap {
         case DecodeResult(a, rest) => Serialize.map[A, B].unpack(a).map(DecodeResult(_, rest))
       }
+    def sizeBound = MessagePackCodec.sizeBound
   }
 
   def extended[A : Codec](code: ByteVector): Codec[A] = gen(Serialize.extended(code))

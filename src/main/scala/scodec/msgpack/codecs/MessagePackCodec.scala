@@ -124,4 +124,5 @@ object MessagePackCodec extends Codec[MessagePack] {
 
   def encode(m: MessagePack) = codec.encode(m)
   def decode(m: BitVector) = codec.decode(m)
+  def sizeBound = codec.sizeBound
 }
