@@ -16,7 +16,7 @@ object ScodecMsgPackBuild extends Build {
     ReleasePlugin.releaseSettings,
     sonatypeSettings
   ).flatten ++ Seq(
-    scalaVersion := "2.11.5",
+    scalaVersion := "2.11.6",
     crossScalaVersions := Seq("2.10.4", scalaVersion.value),
     resolvers += Opts.resolver.sonatypeReleases,
     scalacOptions ++= (
