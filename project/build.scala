@@ -17,7 +17,7 @@ object ScodecMsgPackBuild extends Build {
     sonatypeSettings
   ).flatten ++ Seq(
     scalaVersion := "2.11.6",
-    crossScalaVersions := Seq("2.10.4", scalaVersion.value),
+    crossScalaVersions := Seq("2.10.5", scalaVersion.value),
     resolvers += Opts.resolver.sonatypeReleases,
     scalacOptions ++= (
       "-deprecation" ::
