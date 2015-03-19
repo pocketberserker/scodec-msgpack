@@ -4,6 +4,7 @@ import sbtrelease._
 import xerial.sbt.Sonatype._
 import ReleaseStateTransformations._
 import com.typesafe.sbt.pgp.PgpKeys
+import sbtbuildinfo.Plugin._
 
 object ScodecMsgPackBuild extends Build {
   import Dependencies._
@@ -14,7 +15,8 @@ object ScodecMsgPackBuild extends Build {
 
   lazy val buildSettings = Seq(
     ReleasePlugin.releaseSettings,
-    sonatypeSettings
+    sonatypeSettings,
+    buildInfoSettings
   ).flatten ++ Seq(
     scalaVersion := "2.11.6",
     crossScalaVersions := Seq("2.10.5", scalaVersion.value),
@@ -46,6 +48,18 @@ object ScodecMsgPackBuild extends Build {
      else
        Nil
     },
+    buildInfoKeys := Seq[BuildInfoKey](
+      organization,
+      name,
+      version,
+      scalaVersion,
+      sbtVersion,
+      scalacOptions,
+      licenses
+    ),
+    buildInfoPackage := "scodec.msgpack",
+    buildInfoObject := "BuildInfoScodecMsgpack",
+    sourceGenerators in Compile <+= buildInfo,
     ReleasePlugin.ReleaseKeys.releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,
