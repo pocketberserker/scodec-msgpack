@@ -1,8 +1,8 @@
 import sbt._
 import Keys._
-import sbtrelease._
+import sbtrelease.ReleaseStateTransformations._
+import sbtrelease.ReleasePlugin.autoImport._
 import xerial.sbt.Sonatype._
-import ReleaseStateTransformations._
 import com.typesafe.sbt.pgp.PgpKeys
 import sbtbuildinfo.Plugin._
 
@@ -14,7 +14,6 @@ object ScodecMsgPackBuild extends Build {
   ).getOrElse("master")
 
   lazy val buildSettings = Seq(
-    ReleasePlugin.releaseSettings,
     sonatypeSettings,
     buildInfoSettings
   ).flatten ++ Seq(
@@ -60,7 +59,7 @@ object ScodecMsgPackBuild extends Build {
     buildInfoPackage := "scodec.msgpack",
     buildInfoObject := "BuildInfoScodecMsgpack",
     sourceGenerators in Compile <+= buildInfo,
-    ReleasePlugin.ReleaseKeys.releaseProcess := Seq[ReleaseStep](
+    releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,
       runClean,
