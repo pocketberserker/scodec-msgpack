@@ -35,6 +35,7 @@ object ScodecMsgPackBuild extends Build {
       else
         Nil
     },
+    fullResolvers ~= {_.filterNot(_.name == "jcenter")},
     libraryDependencies ++= Seq(
       scodec,
       scalatest % "test",
