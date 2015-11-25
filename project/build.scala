@@ -5,9 +5,10 @@ import sbtrelease.ReleasePlugin.autoImport._
 import xerial.sbt.Sonatype._
 import com.typesafe.sbt.pgp.PgpKeys
 import sbtbuildinfo.Plugin._
+import org.scalajs.sbtplugin.ScalaJSPlugin
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 
 object ScodecMsgPackBuild extends Build {
-  import Dependencies._
 
   private def gitHash: String = scala.util.Try(
     sys.process.Process("git rev-parse HEAD").lines_!.head
@@ -19,6 +20,7 @@ object ScodecMsgPackBuild extends Build {
   ).flatten ++ Seq(
     scalaVersion := "2.11.7",
     crossScalaVersions := Seq("2.10.6", scalaVersion.value),
+    scalaJSStage in Global := FastOptStage,
     resolvers += Opts.resolver.sonatypeReleases,
     scalacOptions ++= (
       "-deprecation" ::
@@ -37,10 +39,9 @@ object ScodecMsgPackBuild extends Build {
     },
     fullResolvers ~= {_.filterNot(_.name == "jcenter")},
     libraryDependencies ++= Seq(
-      scodec,
-      scalatest % "test",
-      msgpackJava % "test",
-      scalacheck % "test"
+      "org.scodec" %%% "scodec-core" % "1.8.3",
+      "org.scalatest" %%% "scalatest" % "3.0.0-M12" % "test",
+      "org.scalacheck" %%% "scalacheck" % "1.12.5" % "test"
     ),
     libraryDependencies ++= {
      if (scalaBinaryVersion.value startsWith "2.10")
@@ -110,17 +111,19 @@ object ScodecMsgPackBuild extends Build {
     }
   )
 
-  lazy val msgpack = Project(
-    id = "scodec-msgpack",
-    base = file("."),
-    settings = buildSettings
+  lazy val root = project.in(file(".")).settings(
+    publish := {},
+    publishLocal := {},
+    publishArtifact := false
+  ).aggregate(msgpackJS, msgpackJVM)
+
+  lazy val msgpack = crossProject.in(file(".")).settings(
+    buildSettings: _*
+  ).jvmSettings(
+    libraryDependencies += "org.msgpack" % "msgpack-core" % "0.7.1" % "test"
   )
 
-  object Dependencies {
+  lazy val msgpackJVM = msgpack.jvm
+  lazy val msgpackJS = msgpack.js
 
-    val scodec = "org.scodec" %% "scodec-core" % "1.8.2"
-    val scalatest = "org.scalatest" %% "scalatest" % "2.2.5"
-    val scalacheck = "org.scalacheck" %% "scalacheck" % "1.12.4"
-    val msgpackJava = "org.msgpack" % "msgpack-core" % "0.7.0"
-  }
 }
