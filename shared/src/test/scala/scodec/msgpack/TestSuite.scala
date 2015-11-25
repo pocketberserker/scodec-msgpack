@@ -24,9 +24,5 @@ abstract class TestSuite extends FlatSpec with DiagrammedAssertions {
     }
   }
 
-  def roundtripWithJava[A](a: A)(implicit C: WithJavaCodec[A]) = {
-    roundtrip(C.javaEncoderScalaDecoder, a)
-    roundtrip(C.scalaEncoderJavaDecoder, a)
-  }
 }
 
