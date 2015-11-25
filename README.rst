@@ -5,6 +5,8 @@ Scodec MessagePack
     :target: https://travis-ci.org/pocketberserker/scodec-msgpack
 .. image:: https://maven-badges.herokuapp.com/maven-central/com.github.pocketberserker/scodec-msgpack_2.11/badge.svg
     :target: https://maven-badges.herokuapp.com/maven-central/com.github.pocketberserker/scodec-msgpack_2.11
+.. image:: http://javadoc-badge.appspot.com/com.github.pocketberserker/scodec-msgpack_2.11.svg?label=scaladoc
+    :target: http://javadoc-badge.appspot.com/com.github.pocketberserker/scodec-msgpack_2.11
 
 scodec-msgpack is a yet another `MessagePack <http://msgpack.org/>`_ Scala implementation.
 
