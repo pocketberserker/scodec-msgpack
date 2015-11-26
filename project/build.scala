@@ -18,6 +18,7 @@ object ScodecMsgPackBuild extends Build {
     sonatypeSettings,
     buildInfoSettings
   ).flatten ++ Seq(
+    name := "scodec-msgpack",
     scalaVersion := "2.11.7",
     crossScalaVersions := Seq("2.10.6", scalaVersion.value),
     scalaJSStage in Global := FastOptStage,
