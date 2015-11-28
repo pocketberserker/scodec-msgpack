@@ -3,10 +3,15 @@ package scodec.msgpack
 import scodec.{Err, Attempt, Codec}
 import scodec.bits.ByteVector
 
-abstract class Serialize[A] {
+abstract class Serialize[A] { self =>
 
   def pack(v: A): Attempt[MessagePack]
   def unpack(v: MessagePack): Attempt[A]
+
+  final def xmap[B](f: A => B, g: B => A): Serialize[B] = new Serialize[B] {
+    override def pack(v: B) = self.pack(g(v))
+    override def unpack(v: MessagePack) = self.unpack(v).map(f)
+  }
 }
 
 object Serialize {
