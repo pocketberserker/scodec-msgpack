@@ -40,16 +40,16 @@ object MessagePackCodec extends Codec[MessagePack] {
   implicit val bin32: Codec[MBinary32] =
     (constant(hex"c6") :: variableSizeBytesLong(uint32, bytes)).dropUnits.as[MBinary32]
 
-  private def extended(size: Codec[Int]) = size.flatPrepend { n => bytes(1) :: bytes(n) }
+  private def extension(size: Codec[Int]) = size.flatPrepend { n => bytes(1) :: bytes(n) }
 
-  implicit val ext8: Codec[MExtended8] =
-    (constant(hex"c7") :: extended(uint8)).dropUnits.as[MExtended8]
-  implicit val ext16: Codec[MExtended16] =
-    (constant(hex"c8") :: extended(uint16)).dropUnits.as[MExtended16]
+  implicit val ext8: Codec[MExtension8] =
+    (constant(hex"c7") :: extension(uint8)).dropUnits.as[MExtension8]
+  implicit val ext16: Codec[MExtension16] =
+    (constant(hex"c8") :: extension(uint16)).dropUnits.as[MExtension16]
 
   // FIXME: type conversion
-  implicit val ext32: Codec[MExtended32] =
-    (constant(hex"c9") :: (uint32.flatPrepend { n => bytes(1) :: bytes(n.toInt) })).dropUnits.as[MExtended32]
+  implicit val ext32: Codec[MExtension32] =
+    (constant(hex"c9") :: (uint32.flatPrepend { n => bytes(1) :: bytes(n.toInt) })).dropUnits.as[MExtension32]
 
   implicit val float32: Codec[MFloat32] =
     (constant(hex"ca") :: float).dropUnits.as[MFloat32]
@@ -74,16 +74,16 @@ object MessagePackCodec extends Codec[MessagePack] {
   implicit val mint64: Codec[MInt64] =
     (constant(hex"d3") :: int64).dropUnits.as[MInt64]
 
-  implicit val fixExt1: Codec[MFixExtended1] =
-    (constant(hex"d4") :: bytes(1) :: bytes(1)).dropUnits.as[MFixExtended1]
-  implicit val fixExt2: Codec[MFixExtended2] =
-    (constant(hex"d5") :: bytes(1) :: bytes(2)).dropUnits.as[MFixExtended2]
-  implicit val fixExt4: Codec[MFixExtended4] =
-    (constant(hex"d6") :: bytes(1) :: bytes(4)).dropUnits.as[MFixExtended4]
-  implicit val fixExt8: Codec[MFixExtended8] =
-    (constant(hex"d7") :: bytes(1) :: bytes(8)).dropUnits.as[MFixExtended8]
-  implicit val fixExt16: Codec[MFixExtended16] =
-    (constant(hex"d8") :: bytes(1) :: bytes(16)).dropUnits.as[MFixExtended16]
+  implicit val fixExt1: Codec[MFixExtension1] =
+    (constant(hex"d4") :: bytes(1) :: bytes(1)).dropUnits.as[MFixExtension1]
+  implicit val fixExt2: Codec[MFixExtension2] =
+    (constant(hex"d5") :: bytes(1) :: bytes(2)).dropUnits.as[MFixExtension2]
+  implicit val fixExt4: Codec[MFixExtension4] =
+    (constant(hex"d6") :: bytes(1) :: bytes(4)).dropUnits.as[MFixExtension4]
+  implicit val fixExt8: Codec[MFixExtension8] =
+    (constant(hex"d7") :: bytes(1) :: bytes(8)).dropUnits.as[MFixExtension8]
+  implicit val fixExt16: Codec[MFixExtension16] =
+    (constant(hex"d8") :: bytes(1) :: bytes(16)).dropUnits.as[MFixExtension16]
 
   implicit val str8: Codec[MString8] =
     (constant(hex"d9") :: variableSizeBytes(uint8, utf8)).dropUnits.as[MString8]

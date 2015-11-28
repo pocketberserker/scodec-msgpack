@@ -206,30 +206,30 @@ object Serialize {
     }
   }
 
-  def extended[A](code: ByteVector)(implicit S: Codec[A]): Serialize[A] = new Serialize[A] {
+  def extension[A](code: ByteVector)(implicit S: Codec[A]): Serialize[A] = new Serialize[A] {
     def pack(v: A): Attempt[MessagePack] =
       S.encode(v).map(_.bytes).map{encoded =>
         val len = encoded.size
-        if(len <= 1) MFixExtended1(code, encoded)
-        if(len <= 2) MFixExtended2(code, encoded)
-        if(len <= 4) MFixExtended4(code, encoded)
-        if(len <= 8) MFixExtended8(code, encoded)
-        if(len <= 16) MFixExtended16(code, encoded)
-        if(len <= 256) MExtended8(len, code, encoded)
-        else if(len <= 65536) MExtended16(len, code, encoded)
-        else MExtended32(len.toLong, code, encoded)
+        if(len <= 1) MFixExtension1(code, encoded)
+        if(len <= 2) MFixExtension2(code, encoded)
+        if(len <= 4) MFixExtension4(code, encoded)
+        if(len <= 8) MFixExtension8(code, encoded)
+        if(len <= 16) MFixExtension16(code, encoded)
+        if(len <= 256) MExtension8(len, code, encoded)
+        else if(len <= 65536) MExtension16(len, code, encoded)
+        else MExtension32(len.toLong, code, encoded)
       }
 
     def unpack(v: MessagePack): Attempt[A] = v match {
-      case MFixExtended1(_, value) => S.decode(value.bits).map(_.value)
-      case MFixExtended2(_, value) => S.decode(value.bits).map(_.value)
-      case MFixExtended4(_, value) => S.decode(value.bits).map(_.value)
-      case MFixExtended8(_, value) => S.decode(value.bits).map(_.value)
-      case MFixExtended16(_, value) => S.decode(value.bits).map(_.value)
-      case MExtended8(_, _, value) => S.decode(value.bits).map(_.value)
-      case MExtended16(_, _, value) => S.decode(value.bits).map(_.value)
-      case MExtended32(_, _, value) => S.decode(value.bits).map(_.value)
-      case _ => fail("Extended")
+      case MFixExtension1(_, value) => S.decode(value.bits).map(_.value)
+      case MFixExtension2(_, value) => S.decode(value.bits).map(_.value)
+      case MFixExtension4(_, value) => S.decode(value.bits).map(_.value)
+      case MFixExtension8(_, value) => S.decode(value.bits).map(_.value)
+      case MFixExtension16(_, value) => S.decode(value.bits).map(_.value)
+      case MExtension8(_, _, value) => S.decode(value.bits).map(_.value)
+      case MExtension16(_, _, value) => S.decode(value.bits).map(_.value)
+      case MExtension32(_, _, value) => S.decode(value.bits).map(_.value)
+      case _ => fail("Extension")
     }
   }
 }

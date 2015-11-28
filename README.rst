@@ -13,7 +13,7 @@ scodec-msgpack is a yet another `MessagePack <http://msgpack.org/>`_ Scala imple
 MessagePack Specification
 -------------------------
 
-see `MessagePack specification <https://github.com/msgpack/msgpack/blob/2fb4eaa9688888b74bdabb2222f0e0f42712b6b1/spec.md>`_
+see `MessagePack specification <https://github.com/msgpack/msgpack/tree/3b5b7b25033da9b28cea2a2213103a7e321507dc/spec.md>`_
 
 License
 -------

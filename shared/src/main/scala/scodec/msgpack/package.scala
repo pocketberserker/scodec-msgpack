@@ -41,5 +41,5 @@ package object msgpack {
     def sizeBound = MessagePackCodec.sizeBound
   }
 
-  def extended[A : Codec](code: ByteVector): Codec[A] = gen(Serialize.extended(code))
+  def extension[A : Codec](code: ByteVector): Codec[A] = gen(Serialize.extension(code))
 }
