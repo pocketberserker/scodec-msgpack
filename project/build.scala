@@ -120,7 +120,7 @@ object ScodecMsgPackBuild extends Build {
     publishArtifact := false
   ).aggregate(msgpackJS, msgpackJVM)
 
-  lazy val msgpack = crossProject.crossType(CrossType.Pure).in(file(".")).settings(
+  lazy val msgpack = crossProject.crossType(CrossType.Full).in(file(".")).settings(
     buildSettings: _*
   ).jvmSettings(
     libraryDependencies += "org.msgpack" % "msgpack-core" % "0.7.1" % "test"
