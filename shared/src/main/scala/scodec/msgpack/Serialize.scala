@@ -16,9 +16,11 @@ abstract class Serialize[A] { self =>
 
 object Serialize {
 
+  def apply[A](implicit S: Serialize[A]) = S
+
   private def fail(v: String) = Attempt.failure(Err(s"fail to unpack: $v"))
 
-  val bool: Serialize[Boolean] = new Serialize[Boolean] {
+  implicit val bool: Serialize[Boolean] = new Serialize[Boolean] {
 
     def pack(v: Boolean): Attempt[MessagePack] = Attempt.successful(if (v) MTrue else MFalse)
 
@@ -28,7 +30,7 @@ object Serialize {
     }
   }
 
-  val int: Serialize[Int] = new Serialize[Int] {
+  implicit val int: Serialize[Int] = new Serialize[Int] {
 
     // This implementation refer to msgpack-java (Apache License version 2.0).
     // https://github.com/msgpack/msgpack-java/blob/bd9b4f20597111775120546de41dd3f9d01b9616/msgpack-core/src/main/java/org/msgpack/core/MessagePacker.java#L253
@@ -62,7 +64,7 @@ object Serialize {
     }
   }
 
-  val long: Serialize[Long] = new Serialize[Long] {
+  implicit val long: Serialize[Long] = new Serialize[Long] {
 
     // This implementation refer to msgpack-java (Apache License version 2.0).
     // https://github.com/msgpack/msgpack-java/blob/bd9b4f20597111775120546de41dd3f9d01b9616/msgpack-core/src/main/java/org/msgpack/core/MessagePacker.java#L277
@@ -108,7 +110,7 @@ object Serialize {
     }
   }
 
-  val float: Serialize[Float] = new Serialize[Float] {
+  implicit val float: Serialize[Float] = new Serialize[Float] {
 
     def pack(v: Float): Attempt[MessagePack] = Attempt.successful(MFloat32(v))
 
@@ -118,7 +120,7 @@ object Serialize {
     }
   }
 
-  val double: Serialize[Double] = new Serialize[Double] {
+  implicit val double: Serialize[Double] = new Serialize[Double] {
 
     def pack(v: Double): Attempt[MessagePack] = Attempt.successful(MFloat64(v))
 
@@ -128,7 +130,7 @@ object Serialize {
     }
   }
 
-  val string: Serialize[String] = new Serialize[String] {
+  implicit val string: Serialize[String] = new Serialize[String] {
     def pack(v: String): Attempt[MessagePack] = Attempt.successful{
       val len = v.getBytes("UTF-8").length
       if(len <= 31) MFixString(v)
@@ -146,7 +148,7 @@ object Serialize {
     }
   }
 
-  val binary: Serialize[ByteVector] = new Serialize[ByteVector] {
+  implicit val binary: Serialize[ByteVector] = new Serialize[ByteVector] {
     def pack(v: ByteVector): Attempt[MessagePack] = Attempt.successful{
       val len = v.size
       if(len <= 255) MBinary8(v)
@@ -162,7 +164,7 @@ object Serialize {
     }
   }
 
-  def array[A](implicit S: Serialize[A]): Serialize[Vector[A]] = new Serialize[Vector[A]] {
+  implicit def array[A](implicit S: Serialize[A]): Serialize[Vector[A]] = new Serialize[Vector[A]] {
     def pack(vec: Vector[A]): Attempt[MessagePack] = {
       val len = vec.size
       vec.foldLeft(Attempt.successful(Vector.empty[MessagePack])){
@@ -185,7 +187,7 @@ object Serialize {
     }
   }
 
-  def map[A, B](implicit S: Serialize[A], T: Serialize[B]): Serialize[Map[A, B]] = new Serialize[Map[A, B]] {
+  implicit def map[A, B](implicit S: Serialize[A], T: Serialize[B]): Serialize[Map[A, B]] = new Serialize[Map[A, B]] {
     def pack(m: Map[A, B]): Attempt[MessagePack] = {
       val len = m.size
       m.toVector.foldLeft(Attempt.successful(Vector.empty[(MessagePack, MessagePack)])){

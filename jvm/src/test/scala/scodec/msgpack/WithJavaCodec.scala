@@ -1,6 +1,7 @@
 package scodec.msgpack
 
 import scodec.Codec
+import Serialize._
 
 trait WithJavaCodec[A]{
   def javaCodec: Codec[A]
@@ -15,27 +16,27 @@ trait WithJavaCodec[A]{
 
 object WithJavaCodec {
 
-  def apply[A](jcodec: Codec[A], scodec: Codec[A]): WithJavaCodec[A] =
+  def apply[A](jcodec: Codec[A])(implicit scodec: Codec[A]): WithJavaCodec[A] =
     new WithJavaCodec[A] {
       override def scalaCodec = scodec
       override def javaCodec = jcodec
     }
 
   implicit val int: WithJavaCodec[Int] =
-    apply(JavaCodec.int, scodec.msgpack.int)
+    apply(JavaCodec.int)
 
   implicit val long: WithJavaCodec[Long] =
-    apply(JavaCodec.long, scodec.msgpack.long)
+    apply(JavaCodec.long)
 
   implicit val bool: WithJavaCodec[Boolean] =
-    apply(JavaCodec.bool, scodec.msgpack.bool)
+    apply(JavaCodec.bool)
 
   implicit val float: WithJavaCodec[Float] =
-    apply(JavaCodec.float, scodec.msgpack.float)
+    apply(JavaCodec.float)
 
   implicit val double: WithJavaCodec[Double] =
-    apply(JavaCodec.double, scodec.msgpack.double)
+    apply(JavaCodec.double)
 
   implicit val str: WithJavaCodec[String] =
-    apply(JavaCodec.str, scodec.msgpack.str)
+    apply(JavaCodec.str)
 }

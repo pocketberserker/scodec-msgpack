@@ -8,8 +8,8 @@ import org.scalatest.prop.Checkers
 class MessagePackSpecWithJava extends TestSuite with Checkers {
 
   def roundtripWithJava[A](a: A)(implicit C: WithJavaCodec[A]) = {
-    roundtrip(C.javaEncoderScalaDecoder, a)
-    roundtrip(C.scalaEncoderJavaDecoder, a)
+    roundtrip(a)(C.javaEncoderScalaDecoder)
+    roundtrip(a)(C.scalaEncoderJavaDecoder)
   }
 
   "bool" should "be able to encode and decode" in {
