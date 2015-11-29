@@ -62,6 +62,9 @@ object ScodecMsgPackBuild extends Build {
     buildInfoPackage := "scodec.msgpack",
     buildInfoObject := "BuildInfoScodecMsgpack",
     sourceGenerators in Compile <+= buildInfo,
+    releaseCrossBuild := true,
+    releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+    publishArtifact in Test := false,
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,
@@ -70,10 +73,7 @@ object ScodecMsgPackBuild extends Build {
       setReleaseVersion,
       commitReleaseVersion,
       tagRelease,
-      ReleaseStep(
-        action = state => Project.extract(state).runTask(PgpKeys.publishSigned, state)._1,
-        enableCrossBuild = true
-      ),
+      publishArtifacts,
       setNextVersion,
       commitNextVersion,
       pushChanges
@@ -113,12 +113,14 @@ object ScodecMsgPackBuild extends Build {
   )
 
   lazy val root = project.in(file(".")).settings(
+    buildSettings
+  ).settings(
     publish := {},
     publishLocal := {},
     publishArtifact := false
   ).aggregate(msgpackJS, msgpackJVM)
 
-  lazy val msgpack = crossProject.in(file(".")).settings(
+  lazy val msgpack = crossProject.crossType(CrossType.Pure).in(file(".")).settings(
     buildSettings: _*
   ).jvmSettings(
     libraryDependencies += "org.msgpack" % "msgpack-core" % "0.7.1" % "test"
