@@ -56,10 +56,12 @@ object Serialize {
       case MNegativeFixInt(n) => Attempt.successful(n)
       case MUInt8(n) => Attempt.successful(n)
       case MUInt16(n) => Attempt.successful(n)
-      case MUInt32(n) => Attempt.successful(n.toInt)
+      case MUInt32(n) if 0 <= n && n <= Int.MaxValue => Attempt.successful(n.toInt)
+      case MUInt64(n) if 0 <= n && n <= Int.MaxValue => Attempt.successful(n.toInt)
       case MInt8(n) => Attempt.successful(n)
       case MInt16(n) => Attempt.successful(n)
       case MInt32(n) => Attempt.successful(n)
+      case MInt64(n) if Int.MinValue <= n && n <= Int.MaxValue => Attempt.successful(n.toInt)
       case _ => fail("Int")
     }
   }
@@ -126,6 +128,7 @@ object Serialize {
 
     def unpack(v: MessagePack): Attempt[Double] = v match {
       case MFloat64(n) => Attempt.successful(n)
+      case MFloat32(n) => Attempt.successful(n)
       case _ => fail("Double")
     }
   }
