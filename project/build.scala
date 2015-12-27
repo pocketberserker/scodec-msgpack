@@ -14,6 +14,12 @@ object ScodecMsgPackBuild extends Build {
     sys.process.Process("git rev-parse HEAD").lines_!.head
   ).getOrElse("master")
 
+  private[this] val unusedWarnings = (
+    "-Ywarn-unused" ::
+    "-Ywarn-unused-import" ::
+    Nil
+  )
+
   lazy val buildSettings = Seq(
     sonatypeSettings,
     buildInfoSettings
@@ -32,12 +38,9 @@ object ScodecMsgPackBuild extends Build {
       "-language:implicitConversions" ::
       Nil
     ),
-    scalacOptions ++= {
-      if(scalaVersion.value.startsWith("2.11"))
-        Seq("-Ywarn-unused", "-Ywarn-unused-import")
-      else
-        Nil
-    },
+    scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
+      case Some((2, v)) if v >= 11 => unusedWarnings
+    }.toList.flatten,
     fullResolvers ~= {_.filterNot(_.name == "jcenter")},
     libraryDependencies ++= Seq(
       "org.scodec" %%% "scodec-core" % "1.8.3",
@@ -110,6 +113,8 @@ object ScodecMsgPackBuild extends Build {
       val stripTestScope = stripIf { n => n.label == "dependency" && (n \ "scope").text == "test" }
       new RuleTransformer(stripTestScope).transform(node)(0)
     }
+  ) ++ Seq(Compile, Test).flatMap(c =>
+    scalacOptions in (c, console) ~= {_.filterNot(unusedWarnings.toSet)}
   )
 
   lazy val root = project.in(file(".")).settings(
