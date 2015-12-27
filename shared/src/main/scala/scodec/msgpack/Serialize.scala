@@ -96,15 +96,15 @@ object Serialize {
       })
 
     def unpack(v: MessagePack): Attempt[Long] = v match {
-      case MPositiveFixInt(n) => Attempt.successful(n.toLong)
-      case MNegativeFixInt(n) => Attempt.successful(n.toLong)
-      case MUInt8(n) => Attempt.successful(n.toLong)
-      case MUInt16(n) => Attempt.successful(n.toLong)
+      case MPositiveFixInt(n) => Attempt.successful(n)
+      case MNegativeFixInt(n) => Attempt.successful(n)
+      case MUInt8(n) => Attempt.successful(n)
+      case MUInt16(n) => Attempt.successful(n)
       case MUInt32(n) => Attempt.successful(n)
       case MUInt64(n) => Attempt.successful(n)
-      case MInt8(n) => Attempt.successful(n.toLong)
-      case MInt16(n) => Attempt.successful(n.toLong)
-      case MInt32(n) => Attempt.successful(n.toLong)
+      case MInt8(n) => Attempt.successful(n)
+      case MInt16(n) => Attempt.successful(n)
+      case MInt32(n) => Attempt.successful(n)
       case MInt64(n) => Attempt.successful(n)
       case _ => fail("Long")
     }
@@ -224,7 +224,7 @@ object Serialize {
         if(len <= 16) MFixExtension16(code, encoded)
         if(len <= 256) MExtension8(len, code, encoded)
         else if(len <= 65536) MExtension16(len, code, encoded)
-        else MExtension32(len.toLong, code, encoded)
+        else MExtension32(len, code, encoded)
       }
 
     def unpack(v: MessagePack): Attempt[A] = v match {
