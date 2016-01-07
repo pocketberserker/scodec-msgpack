@@ -128,7 +128,7 @@ object ScodecMsgPackBuild extends Build {
   lazy val msgpack = crossProject.crossType(CrossType.Full).in(file(".")).settings(
     buildSettings: _*
   ).jvmSettings(
-    libraryDependencies += "org.msgpack" % "msgpack-core" % "0.8.0" % "test"
+    libraryDependencies += "org.msgpack" % "msgpack-core" % "0.8.1" % "test"
   )
 
   lazy val msgpackJVM = msgpack.jvm
