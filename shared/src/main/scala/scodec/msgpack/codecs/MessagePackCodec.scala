@@ -36,7 +36,7 @@ object MessagePackCodec extends Codec[MessagePack] {
   implicit val bin8: Codec[MBinary8] =
     (constant(hex"c4") :: variableSizeBytes(uint8, bytes)).dropUnits.as[MBinary8]
   implicit val bin16: Codec[MBinary16] =
-    (constant(hex"d5") :: variableSizeBytes(uint16, bytes)).dropUnits.as[MBinary16]
+    (constant(hex"c5") :: variableSizeBytes(uint16, bytes)).dropUnits.as[MBinary16]
   implicit val bin32: Codec[MBinary32] =
     (constant(hex"c6") :: variableSizeBytesLong(uint32, bytes)).dropUnits.as[MBinary32]
 
