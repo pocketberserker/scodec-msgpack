@@ -20,8 +20,8 @@ case object MTrue extends MBool {
 case class MBinary8(b: ByteVector) extends MessagePack
 case class MBinary16(b: ByteVector) extends MessagePack
 case class MBinary32(b: ByteVector) extends MessagePack
-case class MExtension8(size: Int, code: ByteVector, data: ByteVector) extends MessagePack
-case class MExtension16(size: Int, code: ByteVector, data: ByteVector) extends MessagePack
+case class MExtension8(size: Long, code: ByteVector, data: ByteVector) extends MessagePack
+case class MExtension16(size: Long, code: ByteVector, data: ByteVector) extends MessagePack
 case class MExtension32(size: Long, code: ByteVector, data: ByteVector) extends MessagePack
 case class MFloat32(f: Float) extends MessagePack
 case class MFloat64(d: Double) extends MessagePack

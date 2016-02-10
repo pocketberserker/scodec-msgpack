@@ -40,16 +40,16 @@ object MessagePackCodec extends Codec[MessagePack] {
   implicit val bin32: Codec[MBinary32] =
     (constant(hex"c6") :: variableSizeBytesLong(uint32, bytes)).dropUnits.as[MBinary32]
 
-  private def extension(size: Codec[Int]) = size.flatPrepend { n => bytes(1) :: bytes(n) }
+  // FIXME: type conversion
+  private def extension(size: Codec[Long]) = size.flatPrepend { n => bytes(1) :: bytes(n.toInt) }
 
   implicit val ext8: Codec[MExtension8] =
-    (constant(hex"c7") :: extension(uint8)).dropUnits.as[MExtension8]
+    (constant(hex"c7") :: extension(ulong(8))).dropUnits.as[MExtension8]
   implicit val ext16: Codec[MExtension16] =
-    (constant(hex"c8") :: extension(uint16)).dropUnits.as[MExtension16]
+    (constant(hex"c8") :: extension(ulong(16))).dropUnits.as[MExtension16]
 
-  // FIXME: type conversion
   implicit val ext32: Codec[MExtension32] =
-    (constant(hex"c9") :: (uint32.flatPrepend { n => bytes(1) :: bytes(n.toInt) })).dropUnits.as[MExtension32]
+    (constant(hex"c9") :: extension(uint32)).dropUnits.as[MExtension32]
 
   implicit val float32: Codec[MFloat32] =
     (constant(hex"ca") :: float).dropUnits.as[MFloat32]

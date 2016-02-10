@@ -43,7 +43,7 @@ object ScodecMsgPackBuild extends Build {
     }.toList.flatten,
     fullResolvers ~= {_.filterNot(_.name == "jcenter")},
     libraryDependencies ++= Seq(
-      "org.scodec" %%% "scodec-core" % "1.8.3",
+      "org.scodec" %%% "scodec-core" % "1.9.0",
       "org.scalatest" %%% "scalatest" % "3.0.0-M12" % "test",
       "org.scalacheck" %%% "scalacheck" % "1.12.5" % "test"
     ),
