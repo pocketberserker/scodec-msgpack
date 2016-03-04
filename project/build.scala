@@ -14,6 +14,13 @@ object ScodecMsgPackBuild extends Build {
     sys.process.Process("git rev-parse HEAD").lines_!.head
   ).getOrElse("master")
 
+  private val tagName = Def.setting{
+    s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value else version.value}"
+  }
+  private val tagOrHash = Def.setting{
+    if(isSnapshot.value) gitHash else tagName.value
+  }
+
   private[this] val unusedWarnings = (
     "-Ywarn-unused" ::
     "-Ywarn-unused-import" ::
@@ -68,6 +75,7 @@ object ScodecMsgPackBuild extends Build {
     releaseCrossBuild := true,
     releasePublishArtifactsAction := PgpKeys.publishSigned.value,
     publishArtifact in Test := false,
+    releaseTagName := tagName.value,
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
       inquireVersions,
@@ -99,7 +107,7 @@ object ScodecMsgPackBuild extends Build {
       <scm>
         <url>git@github.com:pocketberserker/scodec-msgpack.git</url>
         <connection>scm:git:git@github.com:pocketberserker/scodec-msgpack.git</connection>
-        <tag>{if(isSnapshot.value) gitHash else { "v" + version.value }}</tag>
+        <tag>{tagOrHash.value}</tag>
       </scm>
     ,
     description := "yet another msgpack implementation",
@@ -127,6 +135,12 @@ object ScodecMsgPackBuild extends Build {
 
   lazy val msgpack = crossProject.crossType(CrossType.Full).in(file(".")).settings(
     buildSettings: _*
+  ).jsSettings(
+    scalacOptions += {
+      val a = (baseDirectory in LocalRootProject).value.toURI.toString
+      val g = "https://raw.githubusercontent.com/pocketberserker/scodec-msgpack/" + tagOrHash.value
+      s"-P:scalajs:mapSourceURI:$a->$g/"
+    }
   ).jvmSettings(
     libraryDependencies += "org.msgpack" % "msgpack-core" % "0.8.1" % "test"
   )
