@@ -2,7 +2,7 @@ package scodec.msgpack
 package codecs
 
 import scodec.Codec
-import scodec.bits.{BitVector, ByteVector}
+import scodec.bits.BitVector
 import scodec.bits._
 import scodec.codecs._
 
