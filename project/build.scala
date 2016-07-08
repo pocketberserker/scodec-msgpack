@@ -142,7 +142,7 @@ object ScodecMsgPackBuild extends Build {
       s"-P:scalajs:mapSourceURI:$a->$g/"
     }
   ).jvmSettings(
-    libraryDependencies += "org.msgpack" % "msgpack-core" % "0.8.1" % "test"
+    libraryDependencies += "org.msgpack" % "msgpack-core" % "0.8.7" % "test"
   )
 
   lazy val msgpackJVM = msgpack.jvm
