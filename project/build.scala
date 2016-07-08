@@ -51,8 +51,8 @@ object ScodecMsgPackBuild extends Build {
     fullResolvers ~= {_.filterNot(_.name == "jcenter")},
     libraryDependencies ++= Seq(
       "org.scodec" %%% "scodec-core" % "1.10.2",
-      "org.scalatest" %%% "scalatest" % "3.0.0-M12" % "test",
-      "org.scalacheck" %%% "scalacheck" % "1.12.5" % "test"
+      "org.scalatest" %%% "scalatest" % "3.0.0-RC4" % "test",
+      "org.scalacheck" %%% "scalacheck" % "1.13.1" % "test"
     ),
     libraryDependencies ++= {
      if (scalaBinaryVersion.value startsWith "2.10")
