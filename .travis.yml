@@ -10,3 +10,8 @@ jdk:
 cache:
   directories:
     - $HOME/.ivy2/cache
+
+matrix:
+  include:
+    - scala: 2.12.0-M5
+      jdk: oraclejdk8
