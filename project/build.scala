@@ -8,7 +8,7 @@ import sbtbuildinfo.Plugin._
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 
-object ScodecMsgPackBuild extends Build {
+object ScodecMsgPackBuild {
 
   private def gitHash: String = scala.util.Try(
     sys.process.Process("git rev-parse HEAD").lines_!.head
@@ -125,14 +125,6 @@ object ScodecMsgPackBuild extends Build {
     scalacOptions in (c, console) ~= {_.filterNot(unusedWarnings.toSet)}
   )
 
-  lazy val root = project.in(file(".")).settings(
-    buildSettings
-  ).settings(
-    publish := {},
-    publishLocal := {},
-    publishArtifact := false
-  ).aggregate(msgpackJS, msgpackJVM)
-
   lazy val msgpack = crossProject.crossType(CrossType.Full).in(file(".")).settings(
     buildSettings: _*
   ).jsSettings(
@@ -144,8 +136,4 @@ object ScodecMsgPackBuild extends Build {
   ).jvmSettings(
     libraryDependencies += "org.msgpack" % "msgpack-core" % "0.8.7" % "test"
   )
-
-  lazy val msgpackJVM = msgpack.jvm
-  lazy val msgpackJS = msgpack.js
-
 }
