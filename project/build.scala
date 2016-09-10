@@ -51,8 +51,8 @@ object ScodecMsgPackBuild {
     fullResolvers ~= {_.filterNot(_.name == "jcenter")},
     libraryDependencies ++= Seq(
       "org.scodec" %%% "scodec-core" % "1.10.2",
-      "org.scalatest" %%% "scalatest" % "3.0.0-RC4" % "test",
-      "org.scalacheck" %%% "scalacheck" % "1.13.1" % "test"
+      "org.scalatest" %%% "scalatest" % "3.0.0" % "test",
+      "org.scalacheck" %%% "scalacheck" % "1.13.2" % "test"
     ),
     libraryDependencies ++= {
      if (scalaBinaryVersion.value startsWith "2.10")
@@ -134,6 +134,6 @@ object ScodecMsgPackBuild {
       s"-P:scalajs:mapSourceURI:$a->$g/"
     }
   ).jvmSettings(
-    libraryDependencies += "org.msgpack" % "msgpack-core" % "0.8.7" % "test"
+    libraryDependencies += "org.msgpack" % "msgpack-core" % "0.8.9" % "test"
   )
 }
