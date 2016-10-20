@@ -33,7 +33,7 @@ object ScodecMsgPackBuild {
   ).flatten ++ Seq(
     name := "scodec-msgpack",
     scalaVersion := "2.11.8",
-    crossScalaVersions := Seq("2.10.6", scalaVersion.value, "2.12.0-M5"),
+    crossScalaVersions := Seq("2.10.6", scalaVersion.value, "2.12.0-RC2"),
     scalaJSStage in Global := FastOptStage,
     resolvers += Opts.resolver.sonatypeReleases,
     scalacOptions ++= (
@@ -50,7 +50,7 @@ object ScodecMsgPackBuild {
     }.toList.flatten,
     fullResolvers ~= {_.filterNot(_.name == "jcenter")},
     libraryDependencies ++= Seq(
-      "org.scodec" %%% "scodec-core" % "1.10.2",
+      "org.scodec" %%% "scodec-core" % "1.10.3",
       "org.scalatest" %%% "scalatest" % "3.0.0" % "test",
       "org.scalacheck" %%% "scalacheck" % "1.13.2" % "test"
     ),
