@@ -33,7 +33,7 @@ object ScodecMsgPackBuild {
   ).flatten ++ Seq(
     name := "scodec-msgpack",
     scalaVersion := "2.11.8",
-    crossScalaVersions := Seq("2.10.6", scalaVersion.value, "2.12.0-RC2"),
+    crossScalaVersions := Seq("2.10.6", scalaVersion.value, "2.12.0"),
     scalaJSStage in Global := FastOptStage,
     resolvers += Opts.resolver.sonatypeReleases,
     scalacOptions ++= (
@@ -52,7 +52,7 @@ object ScodecMsgPackBuild {
     libraryDependencies ++= Seq(
       "org.scodec" %%% "scodec-core" % "1.10.3",
       "org.scalatest" %%% "scalatest" % "3.0.0" % "test",
-      "org.scalacheck" %%% "scalacheck" % "1.13.2" % "test"
+      "org.scalacheck" %%% "scalacheck" % "1.13.4" % "test"
     ),
     libraryDependencies ++= {
      if (scalaBinaryVersion.value startsWith "2.10")
