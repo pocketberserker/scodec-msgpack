@@ -33,7 +33,7 @@ object ScodecMsgPackBuild {
   ).flatten ++ Seq(
     name := "scodec-msgpack",
     scalaVersion := "2.11.8",
-    crossScalaVersions := Seq("2.10.6", scalaVersion.value, "2.12.0"),
+    crossScalaVersions := Seq("2.10.6", scalaVersion.value, "2.12.1"),
     scalaJSStage in Global := FastOptStage,
     resolvers += Opts.resolver.sonatypeReleases,
     scalacOptions ++= (
