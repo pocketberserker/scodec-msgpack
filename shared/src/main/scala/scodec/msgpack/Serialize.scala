@@ -92,7 +92,7 @@ object Serialize {
           else MUInt16(v.toInt)
         }
         else {
-          if (v < (1L << 32)) MUInt32(v.toInt)
+          if (v < (1L << 32)) MUInt32(v)
           else MUInt64(v)
         }
       })
