@@ -44,12 +44,12 @@ lazy val buildSettings = Seq(
   fullResolvers ~= {_.filterNot(_.name == "jcenter")},
   libraryDependencies ++= Seq(
     "org.scodec" %%% "scodec-core" % "1.10.3",
-    "org.scalatest" %%% "scalatest" % "3.0.0" % "test",
-    "org.scalacheck" %%% "scalacheck" % "1.13.4" % "test"
+    "org.scalatest" %%% "scalatest" % "3.0.5" % "test",
+    "org.scalacheck" %%% "scalacheck" % "1.13.5" % "test"
   ),
   libraryDependencies ++= {
     if (scalaBinaryVersion.value startsWith "2.10")
-      Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full))
+      Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full))
     else
       Nil
   },
@@ -129,7 +129,7 @@ lazy val msgpack = crossProject.crossType(CrossType.Full).in(file(".")).settings
     s"-P:scalajs:mapSourceURI:$a->$g/"
   }
 ).jvmSettings(
-  libraryDependencies += "org.msgpack" % "msgpack-core" % "0.8.9" % "test"
+  libraryDependencies += "org.msgpack" % "msgpack-core" % "0.8.15" % "test"
 )
 
 lazy val msgpackJVM = msgpack.jvm
