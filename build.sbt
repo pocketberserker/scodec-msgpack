@@ -21,10 +21,12 @@ val unusedWarnings = (
   Nil
 )
 
+val Scala211 = "2.11.12"
+
 lazy val buildSettings = Seq(
   name := "scodec-msgpack",
-  scalaVersion := "2.11.8",
-  crossScalaVersions := Seq("2.10.6", scalaVersion.value, "2.12.1"),
+  scalaVersion := Scala211,
+  crossScalaVersions := Seq("2.10.7", Scala211, "2.12.4"),
   scalaJSStage in Global := FastOptStage,
   resolvers += Opts.resolver.sonatypeReleases,
   scalacOptions ++= (
