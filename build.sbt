@@ -5,7 +5,7 @@ publishLocal := {}
 publishArtifact := false
 
 def gitHash: String = scala.util.Try(
-  sys.process.Process("git rev-parse HEAD").lines_!.head
+  sys.process.Process("git rev-parse HEAD").lineStream.head
 ).getOrElse("master")
 
 val tagName = Def.setting{
@@ -22,9 +22,6 @@ val unusedWarnings = (
 )
 
 lazy val buildSettings = Seq(
-  xerial.sbt.Sonatype.sonatypeSettings,
-  buildInfoSettings
-).flatten ++ Seq(
   name := "scodec-msgpack",
   scalaVersion := "2.11.8",
   crossScalaVersions := Seq("2.10.6", scalaVersion.value, "2.12.1"),
@@ -54,7 +51,7 @@ lazy val buildSettings = Seq(
     else
       Nil
   },
-  buildInfoKeys := Seq[BuildInfoKey](
+  buildInfoKeys := BuildInfoKey.ofN(
     organization,
     name,
     version,
@@ -65,8 +62,8 @@ lazy val buildSettings = Seq(
   ),
   buildInfoPackage := "scodec.msgpack",
   buildInfoObject := "BuildInfoScodecMsgpack",
-  sourceGenerators in Compile <+= buildInfo,
   releaseCrossBuild := true,
+  publishTo := sonatypePublishTo.value,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   publishArtifact in Test := false,
   releaseTagName := tagName.value,
@@ -121,6 +118,8 @@ lazy val buildSettings = Seq(
 
 lazy val msgpack = crossProject.crossType(CrossType.Full).in(file(".")).settings(
   buildSettings: _*
+).enablePlugins(
+  BuildInfoPlugin
 ).jsSettings(
   scalacOptions += {
     val a = (baseDirectory in LocalRootProject).value.toURI.toString
