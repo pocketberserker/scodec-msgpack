@@ -1,3 +1,4 @@
+import sbtcrossproject.{CrossType, crossProject}
 import sbtrelease.ReleaseStateTransformations._
 
 publish := {}
@@ -15,10 +16,15 @@ val tagOrHash = Def.setting{
   if(isSnapshot.value) gitHash else tagName.value
 }
 
-val unusedWarnings = (
-  "-Ywarn-unused" ::
-  "-Ywarn-unused-import" ::
-  Nil
+val unusedWarnings = Def.setting(
+  CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, 10)) =>
+      Nil
+    case Some((2, 11)) =>
+      Seq("-Ywarn-unused-import")
+    case _ =>
+      Seq("-Ywarn-unused:imports")
+  }
 )
 
 val Scala211 = "2.11.12"
@@ -26,7 +32,7 @@ val Scala211 = "2.11.12"
 lazy val buildSettings = Seq(
   name := "scodec-msgpack",
   scalaVersion := Scala211,
-  crossScalaVersions := Seq("2.10.7", Scala211, "2.12.4"),
+  crossScalaVersions := Seq("2.10.7", Scala211, "2.12.8"),
   scalaJSStage in Global := FastOptStage,
   resolvers += Opts.resolver.sonatypeReleases,
   scalacOptions ++= (
@@ -38,14 +44,12 @@ lazy val buildSettings = Seq(
     "-language:implicitConversions" ::
     Nil
   ),
-  scalacOptions ++= PartialFunction.condOpt(CrossVersion.partialVersion(scalaVersion.value)){
-    case Some((2, v)) if v >= 11 => unusedWarnings
-  }.toList.flatten,
+  scalacOptions ++= unusedWarnings.value,
   fullResolvers ~= {_.filterNot(_.name == "jcenter")},
   libraryDependencies ++= Seq(
     "org.scodec" %%% "scodec-core" % "1.10.3",
-    "org.scalatest" %%% "scalatest" % "3.0.5" % "test",
-    "org.scalacheck" %%% "scalacheck" % "1.13.5" % "test"
+    "org.scalatest" %%% "scalatest" % "3.0.7" % "test",
+    "org.scalacheck" %%% "scalacheck" % "1.14.0" % "test"
   ),
   libraryDependencies ++= {
     if (scalaBinaryVersion.value startsWith "2.10")
@@ -115,10 +119,10 @@ lazy val buildSettings = Seq(
     new RuleTransformer(stripTestScope).transform(node)(0)
   }
 ) ++ Seq(Compile, Test).flatMap(c =>
-  scalacOptions in (c, console) ~= {_.filterNot(unusedWarnings.toSet)}
+  scalacOptions in (c, console) --= unusedWarnings.value
 )
 
-lazy val msgpack = crossProject.crossType(CrossType.Full).in(file(".")).settings(
+lazy val msgpack = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Full).in(file(".")).settings(
   buildSettings: _*
 ).enablePlugins(
   BuildInfoPlugin
@@ -129,7 +133,7 @@ lazy val msgpack = crossProject.crossType(CrossType.Full).in(file(".")).settings
     s"-P:scalajs:mapSourceURI:$a->$g/"
   }
 ).jvmSettings(
-  libraryDependencies += "org.msgpack" % "msgpack-core" % "0.8.15" % "test"
+  libraryDependencies += "org.msgpack" % "msgpack-core" % "0.8.16" % "test"
 )
 
 lazy val msgpackJVM = msgpack.jvm

@@ -3,7 +3,7 @@ package msgpack
 
 import org.scalacheck.Prop._
 import org.scalacheck.Arbitrary._
-import org.scalatest.prop.Checkers
+import org.scalatestplus.scalacheck.Checkers
 import scala.util.Random
 
 class MessagePackSpec extends TestSuite with Checkers {

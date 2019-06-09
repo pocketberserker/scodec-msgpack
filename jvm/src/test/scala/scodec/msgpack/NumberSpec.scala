@@ -8,7 +8,7 @@ import org.msgpack.core.MessagePack.Code
 import org.scalacheck.Gen
 import org.scalacheck.Prop.forAll
 import org.scalatest.FlatSpec
-import org.scalatest.prop.Checkers
+import org.scalatestplus.scalacheck.Checkers
 import scodec.bits.BitVector
 
 class NumberSpec extends FlatSpec with Checkers {
