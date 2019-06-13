@@ -32,7 +32,7 @@ val Scala211 = "2.11.12"
 lazy val buildSettings = Seq(
   name := "scodec-msgpack",
   scalaVersion := Scala211,
-  crossScalaVersions := Seq("2.10.7", Scala211, "2.12.8"),
+  crossScalaVersions := Seq(Scala211, "2.12.8", "2.13.0"),
   scalaJSStage in Global := FastOptStage,
   resolvers += Opts.resolver.sonatypeReleases,
   scalacOptions ++= (
@@ -47,16 +47,10 @@ lazy val buildSettings = Seq(
   scalacOptions ++= unusedWarnings.value,
   fullResolvers ~= {_.filterNot(_.name == "jcenter")},
   libraryDependencies ++= Seq(
-    "org.scodec" %%% "scodec-core" % "1.10.3",
-    "org.scalatest" %%% "scalatest" % "3.0.7" % "test",
+    "org.scodec" %%% "scodec-core" % "1.11.4",
+    "org.scalatest" %%% "scalatest" % "3.0.8" % "test",
     "org.scalacheck" %%% "scalacheck" % "1.14.0" % "test"
   ),
-  libraryDependencies ++= {
-    if (scalaBinaryVersion.value startsWith "2.10")
-      Seq(compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full))
-    else
-      Nil
-  },
   buildInfoKeys := BuildInfoKey.ofN(
     organization,
     name,
